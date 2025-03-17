@@ -12,6 +12,8 @@ import CreateBlog from "./pages/CreateBlog";
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
 import Profile from './pages/Profile';
+import YourBlogs from './pages/YourBlogs';
+import BlogDetail from './pages/BlogDetail';
 
 function App() {
   // ✅ Initialize state with localStorage data
@@ -67,9 +69,14 @@ function App() {
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password/:uid/:token" element={<ResetPassword />} />
         <Route path="/profile" element={<Profile user={user} setUser={updateUser} />} />
+        <Route path="/yourblog" element={<YourBlogs/>}/>
+        <Route path="/blogs/:id" element={<BlogDetail />} />
+        
       </Routes>
     </>
   );
 }
 
 export default App;
+
+

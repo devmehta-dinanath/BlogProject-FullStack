@@ -16,7 +16,7 @@ const Home = ({ user }) => {
     console.log("USER STATE IN HOME:", user); // ✅ Debugging user state
     if (user?.id) {
       console.log("✅ Redirecting to CreateBlog");
-      navigate("/create-blog"); // ✅ Redirect if logged in
+      navigate("/dashboard"); // ✅ Redirect if logged in
     } else {
       console.log("❌ Redirecting to Login");
       navigate("/login"); // ✅ Redirect to login if logged out
