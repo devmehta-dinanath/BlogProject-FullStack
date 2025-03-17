@@ -7,18 +7,27 @@
 // const Navbar = ({ user, setUser }) => {
 //   const [isOpen, setIsOpen] = useState(false);
 //   const [dropdownOpen, setDropdownOpen] = useState(false);
+//   const [profileImage, setProfileImage] = useState(profile);
 
 //   useEffect(() => {
 //     // ✅ Sync user state with localStorage
 //     const storedUser = JSON.parse(localStorage.getItem("user"));
 //     if (storedUser) {
 //       setUser(storedUser);
+//       if (storedUser.profile_picture) {
+//         setProfileImage(`http://127.0.0.1:8000${storedUser.profile_picture}`);
+//       }
 //     }
 
 //     // ✅ Listen for changes in localStorage to update user data
 //     const handleStorageChange = () => {
 //       const updatedUser = JSON.parse(localStorage.getItem("user"));
 //       setUser(updatedUser);
+//       if (updatedUser?.profile_picture) {
+//         setProfileImage(`http://127.0.0.1:8000${updatedUser.profile_picture}`);
+//       } else {
+//         setProfileImage(profile);
+//       }
 //     };
 
 //     window.addEventListener("storage", handleStorageChange);
@@ -35,13 +44,11 @@
 //     localStorage.removeItem("user");
 //     localStorage.removeItem("authorId");
 //     localStorage.removeItem("profile_picture");
-  
+
 //     // ✅ Reset state immediately
 //     setUser(null);
-  
- 
+//     setProfileImage(profile);
 //   };
-  
 
 //   return (
 //     <nav className="bg-blue-600 text-white shadow-md">
@@ -62,9 +69,14 @@
 //             <Link to="/" className="hover:text-gray-300">Home</Link>
 //             <Link to="/dashboard" className="hover:text-gray-300">Blog</Link>
 //             {user && (
-//               <Link to="/create-blog" className="hover:text-gray-300">
-//                 Create Blog
-//               </Link>
+//               <>
+//                 <Link to="/yourblog" className="hover:text-gray-300">
+//                   Your Blogs
+//                 </Link>
+//                 <Link to="/create-blog" className="hover:text-gray-300">
+//                   Create Blog
+//                 </Link>
+//               </>
 //             )}
 //           </div>
 
@@ -76,9 +88,10 @@
 //                 className="flex items-center focus:outline-none"
 //               >
 //                 <img
-//                   src={user.profile_picture || profile}
+//                   src={profileImage}
 //                   alt="Profile"
 //                   className="h-10 w-10 rounded-full object-cover border-2 border-white"
+//                   onError={() => setProfileImage(profile)} // ✅ Handle broken image links
 //                 />
 //               </button>
 
@@ -139,6 +152,9 @@
 //           <Link to="/dashboard" className="block hover:text-gray-300">Blogs</Link>
 //           {user && (
 //             <>
+//               <Link to="/your-blogs" className="block hover:text-gray-300">
+//                 Your Blogs
+//               </Link>
 //               <Link to="/create-blog" className="block hover:text-gray-300">
 //                 Create Blog
 //               </Link>
@@ -170,7 +186,6 @@
 // };
 
 // export default Navbar;
-
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import logo from "../assets/logo.png";
@@ -179,18 +194,24 @@ import profile from "../assets/profile.jpeg";
 const Navbar = ({ user, setUser }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [profileImage, setProfileImage] = useState(profile);
 
+  // ✅ Sync user state with localStorage only if changed
   useEffect(() => {
-    // ✅ Sync user state with localStorage
     const storedUser = JSON.parse(localStorage.getItem("user"));
-    if (storedUser) {
+    if (storedUser && JSON.stringify(storedUser) !== JSON.stringify(user)) {
       setUser(storedUser);
+      if (storedUser.profile_picture) {
+        setProfileImage(`http://127.0.0.1:8000${storedUser.profile_picture}`);
+      }
     }
 
-    // ✅ Listen for changes in localStorage to update user data
+    // ✅ Listen for changes in localStorage to update user data automatically
     const handleStorageChange = () => {
       const updatedUser = JSON.parse(localStorage.getItem("user"));
-      setUser(updatedUser);
+      if (JSON.stringify(updatedUser) !== JSON.stringify(user)) {
+        setUser(updatedUser);
+      }
     };
 
     window.addEventListener("storage", handleStorageChange);
@@ -198,7 +219,16 @@ const Navbar = ({ user, setUser }) => {
     return () => {
       window.removeEventListener("storage", handleStorageChange);
     };
-  }, []);
+  }, [user, setUser]);
+
+  // ✅ Auto-update profile image when user state changes
+  useEffect(() => {
+    if (user?.profile_picture) {
+      setProfileImage(`http://127.0.0.1:8000${user.profile_picture}`);
+    } else {
+      setProfileImage(profile);
+    }
+  }, [user?.profile_picture]);
 
   const handleLogout = () => {
     // ✅ Remove all keys from localStorage
@@ -210,6 +240,7 @@ const Navbar = ({ user, setUser }) => {
 
     // ✅ Reset state immediately
     setUser(null);
+    setProfileImage(profile);
   };
 
   return (
@@ -250,9 +281,10 @@ const Navbar = ({ user, setUser }) => {
                 className="flex items-center focus:outline-none"
               >
                 <img
-                  src={user.profile_picture || profile}
+                  src={profileImage}
                   alt="Profile"
                   className="h-10 w-10 rounded-full object-cover border-2 border-white"
+                  onError={() => setProfileImage(profile)} // ✅ Handle broken images
                 />
               </button>
 
