@@ -61,7 +61,7 @@ const Register = () => {
       if (response.status === 201) {
         setMessage("Verification link has been sent to your registered email ID.");
         alert("Verification link has been sent to your registered email ID.");
-        navigate("/login"); // Redirect to login after success
+         
       } else {
         const data = await response.json();
         setError(data?.message || "Something went wrong. Please try again.");

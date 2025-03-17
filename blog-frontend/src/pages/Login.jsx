@@ -12,58 +12,7 @@ const Login = ({ setUser }) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // ✅ Handle login submission
-  // const handleSubmit = async (e) => {
-  //   e.preventDefault();
-  //   setError("");
-  //   try {
-  //     const response = await fetch("http://127.0.0.1:8000/api/auth/login/", {
-  //       method: "POST",
-  //       headers: {
-  //         "Content-Type": "application/json"
-  //       },
-  //       body: JSON.stringify(formData)
-  //     });
-
-  //     if (response.status === 200) {
-  //       const data = await response.json();
-
-  //       // ✅ Store tokens in localStorage
-  //       localStorage.setItem("accessToken", data.access_token);
-  //       localStorage.setItem("refreshToken", data.refresh_token);
-
-  //       // ✅ Save complete user data to localStorage
-  //       const userData = {
-  //         id: data.user.id, // ✅ Make sure id exists in the response
-  //         username: data.user.username,
-  //         email: data.user.email,
-  //         phone: data.user.phone || "",
-  //         profile_picture: data.user.profile_picture || null,
-  //         first_name: data.user.first_name || "",
-  //         last_name: data.user.last_name || "",
-  //       };
-
-  //       console.log("User Data:", userData); // ✅ Debugging check
-
-  //       // ✅ Store user in localStorage
-  //       localStorage.setItem("user", JSON.stringify(userData));
-  //       if (userData.profile_picture) {
-  //         localStorage.setItem("profile_picture", userData.profile_picture);
-  //       }
-
-  //       // ✅ Update global state
-  //       setUser(userData);
-
-  //       navigate("/"); // ✅ Redirect to home after login
-  //     } else {
-  //       const errorData = await response.json();
-  //       setError(errorData.detail || "Login failed. Please try again.");
-  //     }
-  //   } catch (error) {
-  //     console.error("Login error:", error);
-  //     setError("Something went wrong. Please try again.");
-  //   }
-  // };
+  // // ✅ Handle form submission
   // const handleSubmit = async (e) => {
   //   e.preventDefault();
   //   setError("");
@@ -94,12 +43,15 @@ const Login = ({ setUser }) => {
   //         last_name: data.user.last_name || "",
   //       };
   
-  //       console.log("User Data:", userData); // ✅ Debugging
+  //       console.log("User Data:", userData); //  Debugging
   
   //       localStorage.setItem("user", JSON.stringify(userData));
+  //       localStorage.setItem("authorId", userData.id);  // Store authorId separately
   //       if (userData.profile_picture) {
   //         localStorage.setItem("profile_picture", userData.profile_picture);
   //       }
+
+        
   
   //       // ✅ Update state
   //       setUser(userData);
@@ -113,58 +65,72 @@ const Login = ({ setUser }) => {
   //     console.error("Login error:", error);
   //     setError("Something went wrong. Please try again.");
   //   }
+    
   // };
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+  
     try {
       const response = await fetch("http://127.0.0.1:8000/api/auth/login/", {
         method: "POST",
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(formData),
       });
   
-      if (response.status === 200) {
-        const data = await response.json();
+      if (response.ok) {
+        let data;
+        try {
+          data = await response.json(); // ✅ Handle bad JSON response
+        } catch (jsonError) {
+          throw new Error("Invalid server response");
+        }
   
         // ✅ Store tokens in localStorage
-        localStorage.setItem("accessToken", data.access_token);
-        localStorage.setItem("refreshToken", data.refresh_token);
+        localStorage.setItem("accessToken", data?.access_token);
+        localStorage.setItem("refreshToken", data?.refresh_token);
   
-        // ✅ Store full user data in localStorage
+        // ✅ Build user data object
         const userData = {
-          id: data.user.id,
-          username: data.user.username,
-          email: data.user.email,
-          phone: data.user.phone || "",
-          profile_picture: data.user.profile_picture || null,
-          first_name: data.user.first_name || "",
-          last_name: data.user.last_name || "",
+          id: data?.user?.id || null,
+          username: data?.user?.username || "",
+          email: data?.user?.email || "",
+          phone: data?.user?.phone || "",
+          profile_picture: data?.user?.profile_picture || null,
+          first_name: data?.user?.first_name || "",
+          last_name: data?.user?.last_name || "",
         };
   
         console.log("User Data:", userData); // ✅ Debugging
   
+        // ✅ Store full user data in localStorage
         localStorage.setItem("user", JSON.stringify(userData));
-        localStorage.setItem("authorId", userData.id);  // ✅ Store authorId separately
+        localStorage.setItem("authorId", userData.id);
+  
         if (userData.profile_picture) {
           localStorage.setItem("profile_picture", userData.profile_picture);
         }
   
-        // ✅ Update state
+        // ✅ Update state immediately
         setUser(userData);
   
-        navigate("/"); // ✅ Redirect to home
+        // ✅ Use navigate after state is updated to avoid race condition
+        navigate("/");
       } else {
-        const errorData = await response.json();
-        setError(errorData.detail || "Login failed. Please try again.");
+        const errorData = await response.json().catch(() => ({
+          detail: "Login failed. Please try again.",
+        }));
+        setError(errorData?.detail || "Login failed. Please try again.");
       }
     } catch (error) {
       console.error("Login error:", error);
       setError("Something went wrong. Please try again.");
     }
   };
+
+  
   
   return (
     <div className="flex justify-center items-center h-screen bg-gray-100">

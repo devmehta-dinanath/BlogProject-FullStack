@@ -29,11 +29,19 @@ const Navbar = ({ user, setUser }) => {
   }, []);
 
   const handleLogout = () => {
+    // ✅ Remove all keys from localStorage
     localStorage.removeItem("accessToken");
     localStorage.removeItem("refreshToken");
     localStorage.removeItem("user");
+    localStorage.removeItem("authorId");
+    localStorage.removeItem("profile_picture");
+  
+    // ✅ Reset state immediately
     setUser(null);
+  
+ 
   };
+  
 
   return (
     <nav className="bg-blue-600 text-white shadow-md">

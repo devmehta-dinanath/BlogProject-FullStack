@@ -1,4 +1,3 @@
-
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useState, useEffect } from "react";
@@ -15,102 +14,51 @@ import ResetPassword from './pages/ResetPassword';
 import Profile from './pages/Profile';
 
 function App() {
-  // ✅ Initialize user state with full user data from localStorage
+  // ✅ Initialize state with localStorage data
   const [user, setUser] = useState(() => {
     const storedUser = localStorage.getItem("user");
-    if (storedUser) {
-      const parsedUser = JSON.parse(storedUser);
-      return {
-        id: parsedUser?.id || null, // ✅ Ensure id is properly stored
-        username: parsedUser?.username || "",
-        email: parsedUser?.email || "",
-        phone: parsedUser?.phone || "",
-        first_name: parsedUser?.first_name || "",
-        last_name: parsedUser?.last_name || "",
-        profile_picture: parsedUser?.profile_picture || null, // ✅ Handle missing profile picture
-      };
-    }
-    return null;
+    return storedUser ? JSON.parse(storedUser) : null;
   });
 
   const location = useLocation();
 
-  // ✅ Sync user data from localStorage on app load
+  // ✅ Sync user state from localStorage on app load
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
     if (storedUser) {
       const parsedUser = JSON.parse(storedUser);
-      setUser({
-        id: parsedUser?.id || null,
-        username: parsedUser?.username || "",
-        email: parsedUser?.email || "",
-        phone: parsedUser?.phone || "",
-        first_name: parsedUser?.first_name || "",
-        last_name: parsedUser?.last_name || "",
-        profile_picture: parsedUser?.profile_picture || null,
-      });
+      setUser(parsedUser);
     }
   }, []);
+
+  // ✅ Update user state when profile is updated
+  const updateUser = (userData) => {
+    setUser(userData);
+    localStorage.setItem("user", JSON.stringify(userData));
+  };
+
+  // ✅ Handle logout and state reset
+  const handleLogout = () => {
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("refreshToken");
+    localStorage.removeItem("user");
+    setUser(null);
+    window.location.href = "/login"; // ✅ Force reload after logout
+  };
 
   // ✅ Hide Navbar on specific routes
   const hideNavbar =
     location.pathname === "/login" || location.pathname.startsWith("/verify-email");
 
-  // ✅ Handle user update to persist profile picture and user ID
-  const updateUser = (userData) => {
-    setUser(userData);
-
-    // ✅ Save full user data to localStorage
-    localStorage.setItem("user", JSON.stringify(userData));
-
-    // ✅ Persist profile picture separately for quick access
-    if (userData?.profile_picture) {
-      localStorage.setItem("profile_picture", userData.profile_picture);
-    }
-  };
-
-
-const handleLogout = () => {
-  // ✅ Clear localStorage completely
-  localStorage.removeItem("accessToken");
-  localStorage.removeItem("refreshToken");
-  localStorage.removeItem("user");
-  localStorage.removeItem("profile_picture");
-
-  // ✅ Force state update and rerender
-  setUser(null);
-
-  // ✅ Optional: Force rerender by navigating to login page
-  window.location.href = "/login";
-};
-
   return (
     <>
-      {/* ✅ Toast Container */}
-      <ToastContainer
-        position="top-center"
-        autoClose={3000}
-        hideProgressBar={true}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss={false}
-        draggable
-        pauseOnHover
-        theme="light"
-      />
+      <ToastContainer position="top-center" autoClose={3000} />
 
-      {/* ✅ Conditionally render Navbar */}
-      {!hideNavbar && (
-        <Navbar
-          user={user}
-          setUser={updateUser}
-          onLogout={handleLogout}
-        />
-      )}
+      {!hideNavbar && <Navbar user={user} setUser={updateUser} onLogout={handleLogout} />}
 
+      {/* ✅ Pass `user` state to Home */}
       <Routes>
-        <Route path="/" element={<Home />} />
+        <Route path="/" element={<Home user={user} />} />
         <Route path="/login" element={<Login setUser={updateUser} />} />
         <Route path="/register" element={<Register />} />
         <Route path="/dashboard" element={<Dashboard />} />

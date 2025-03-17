@@ -29,27 +29,13 @@ const Dashboard = () => {
       }
     };
     
-  //   const fetchBlogs = async () => {
-  //     try {
-  //       const response = await fetch('http://127.0.0.1:8000/api/blogs/');
-  //       if (!response.ok) {
-  //         throw new Error('Failed to fetch blogs');
-  //       }
-  //       const data = await response.json();
-  //       setBlogs(data);
-  //     } catch (err) {
-  //       console.error(err);
-  //       setError('Failed to load blogs');
-  //     }
-  //   };
-
     fetchBlogs();
   }, []);
 
   return (
     <div className="max-w-7xl mx-auto p-4">
       {/* ✅ Heading */}
-      <h2 className="text-3xl font-bold mb-6 text-center">📚 Your Blogs</h2>
+      <h2 className="text-3xl font-bold mb-6 text-center">📚 All Blogs</h2>
 
       {/* ✅ Error Message */}
       {error && <div className="text-red-500 text-center mb-4">{error}</div>}
@@ -64,7 +50,7 @@ const Dashboard = () => {
             {/* ✅ Blog Image */}
             {blog.image && (
               <img
-                src={blog.image}
+                src={`http://127.0.0.1:8000${blog.image}`} 
                 alt={blog.title}
                 className="h-48 w-full object-cover rounded-t-lg"
               />
@@ -79,10 +65,18 @@ const Dashboard = () => {
                 {blog.content}
               </p>
 
-              {/* ✅ Footer */}
+              {/* ✅ Footer - Author and Date */}
               <div className="flex justify-between items-center text-sm text-gray-500">
-                <span>✍️ {blog.author}</span>
-                <span>{new Date(blog.created_at).toLocaleDateString()}</span>
+                <span>✍️ {blog.author}</span> {/* Display Author's Username */}
+                <span>
+                  {new Date(blog.created_at).toLocaleString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                  })}
+                </span>
               </div>
             </div>
           </div>
