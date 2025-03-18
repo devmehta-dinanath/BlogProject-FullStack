@@ -277,7 +277,15 @@ class CreateBlogView(generics.ListCreateAPIView):
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
+class BlogView(generics.ListCreateAPIView):
+    # permission_classes = [permissions.IsAuthenticated]
+    serializer_class = BlogPostSerializer
 
+    def get_queryset(self):
+        return BlogPost.objects.all()
+
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user)
 
 # ✅ Blog Detail View (Restored)
 class BlogDetailView(generics.RetrieveAPIView):
@@ -401,19 +409,6 @@ class DeleteCommentView(generics.DestroyAPIView):
         return Response({"detail": "Comment deleted successfully."}, status=status.HTTP_204_NO_CONTENT)
 
 
-# from rest_framework import generics, permissions
-# from .models import BlogPost
-# from .serializers import BlogPostSerializer
-
-# class BlogListView(generics.ListCreateAPIView):
-#     queryset = BlogPost.objects.all()
-#     serializer_class = BlogPostSerializer
-    
-#     def get_permissions(self):
-#         if self.request.method == 'GET':
-#             return [permissions.AllowAny()]  # ✅ Allow unauthenticated GET requests
-#         return [permissions.IsAuthenticated()]
-
 
 from rest_framework import generics, permissions, pagination
 from .models import BlogPost
@@ -425,12 +420,43 @@ class BlogPagination(pagination.PageNumberPagination):
     page_size_query_param = 'page_size'
     max_page_size = 10
 
+from rest_framework.permissions import AllowAny
+from rest_framework import generics
+from .models import BlogPost
+from .serializers import BlogPostSerializer
+
+from rest_framework import permissions, generics
+from .models import BlogPost
+from .serializers import BlogPostSerializer
+
+
 class BlogListView(generics.ListCreateAPIView):
     queryset = BlogPost.objects.all().order_by('-created_at')
     serializer_class = BlogPostSerializer
     pagination_class = BlogPagination
     
+    # ✅ Allow GET for everyone, require login for POST
     def get_permissions(self):
         if self.request.method == 'GET':
-            return [permissions.AllowAny()]  # ✅ Allow unauthenticated GET requests
-        return [permissions.IsAuthenticated()]
+            return [permissions.AllowAny()]  # ✅ Public access for GET
+        return [permissions.IsAuthenticated()]  # ✅ Require login for POST
+
+# class BlogListView(generics.ListCreateAPIView):
+#     queryset = BlogPost.objects.all().order_by('-created_at')
+#     serializer_class = BlogPostSerializer
+#     pagination_class = BlogPagination
+#     permission_classes = [AllowAny] 
+    
+#     def get_permissions(self):
+#         if self.request.method == 'GET':
+#             return [permissions.AllowAny()]  # ✅ Allow unauthenticated GET requests
+#         return [permissions.IsAuthenticated()]
+    
+#     from rest_framework.permissions import IsAuthenticated
+
+
+#     def get_permissions(self):
+#         if self.request.method == 'POST':
+#             return [IsAuthenticated()]  # ✅ Require login for POST
+#         return [AllowAny()]  # ✅ Allow public GET
+

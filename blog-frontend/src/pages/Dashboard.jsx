@@ -12,35 +12,29 @@ const Dashboard = () => {
 
   const navigate = useNavigate();
 
+
   // ✅ Fetch Blogs
   const fetchBlogs = async () => {
     try {
       const token = localStorage.getItem("accessToken");
-
+  
+      // ✅ Only include Authorization header if token is available
       const headers = {
         "Content-Type": "application/json",
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
       };
-
-      const response = await fetch("http://127.0.0.1:8000/api/blogs/", {
+  
+      console.log("Fetching blogs with headers:", headers);
+  
+      const response = await fetch("http://127.0.0.1:8000/api/getblogs/", {
         method: "GET",
         headers,
       });
-
+  
       if (!response.ok) {
-        if (response.status === 401 && token) {
-          console.log("Access token expired. Attempting to refresh...");
-          const refreshed = await refreshAccessToken();
-          if (refreshed) {
-            await fetchBlogs();
-          } else {
-            throw new Error("Session expired. Please log in again.");
-          }
-        } else {
-          throw new Error("Failed to fetch blogs");
-        }
+        throw new Error("Failed to fetch blogs");
       }
-
+  
       const data = await response.json();
       setBlogs(data);
     } catch (err) {
@@ -48,13 +42,87 @@ const Dashboard = () => {
       setError(err.message || "Failed to load blogs");
     }
   };
+  
+  
+  
+// const fetchBlogs = async () => {
+//   try {
+//     const token = localStorage.getItem("accessToken");
+
+//     const headers = {
+//       "Content-Type": "application/json",
+//       ...(token ? { Authorization: `Bearer ${token}` } : {}), // ✅ Conditionally add token
+//     };
+
+//     const response = await fetch("http://127.0.0.1:8000/api/blogs/", {
+//       method: "GET",
+//       headers,
+//     });
+
+//     if (!response.ok) {
+//       if (response.status === 401 && token) {
+//         console.log("Access token expired. Attempting to refresh...");
+//         const refreshed = await refreshAccessToken();
+//         if (refreshed) {
+//           await fetchBlogs(); // ✅ Retry fetching after token refresh
+//         } else {
+//           throw new Error("Session expired. Please log in again.");
+//         }
+//       } else {
+//         throw new Error("Failed to fetch blogs");
+//       }
+//     }
+
+//     const data = await response.json();
+//     setBlogs(data);
+//   } catch (err) {
+//     console.error("Error fetching blogs:", err);
+//     setError(err.message || "Failed to load blogs");
+//   }
+// };
+
+  // const fetchBlogs = async () => {
+  //   try {
+  //     const token = localStorage.getItem("accessToken");
+
+  //     const headers = {
+  //       "Content-Type": "application/json",
+  //       ...(token ? { Authorization: `Bearer ${token}` } : {}),
+  //     };
+
+  //     const response = await fetch("http://127.0.0.1:8000/api/blogs/", {
+  //       method: "GET",
+  //       headers,
+  //     });
+
+  //     if (!response.ok) {
+  //       if (response.status === 401 && token) {
+  //         console.log("Access token expired. Attempting to refresh...");
+  //         const refreshed = await refreshAccessToken();
+  //         if (refreshed) {
+  //           await fetchBlogs();
+  //         } else {
+  //           throw new Error("Session expired. Please log in again.");
+  //         }
+  //       } else {
+  //         throw new Error("Failed to fetch blogs");
+  //       }
+  //     }
+
+  //     const data = await response.json();
+  //     setBlogs(data);
+  //   } catch (err) {
+  //     console.error("Error fetching blogs:", err);
+  //     setError(err.message || "Failed to load blogs");
+  //   }
+  // };
 
   // ✅ Refresh Access Token
   const refreshAccessToken = async () => {
     try {
       const refreshToken = localStorage.getItem("refreshToken");
       if (!refreshToken) return null;
-
+  
       const response = await fetch("http://127.0.0.1:8000/api/auth/token/refresh/", {
         method: "POST",
         headers: {
@@ -62,19 +130,46 @@ const Dashboard = () => {
         },
         body: JSON.stringify({ refresh: refreshToken }),
       });
-
+  
       if (!response.ok) throw new Error("Failed to refresh token");
-
+  
       const data = await response.json();
       localStorage.setItem("accessToken", data.access);
       console.log("Token refreshed successfully");
       return data.access;
     } catch (err) {
       console.error("Failed to refresh token:", err);
-      handleLogout(); 
+      handleLogout(); // ✅ Logout if refresh fails
       return null;
     }
   };
+  
+  
+  // const refreshAccessToken = async () => {
+  //   try {
+  //     const refreshToken = localStorage.getItem("refreshToken");
+  //     if (!refreshToken) return null;
+
+  //     const response = await fetch("http://127.0.0.1:8000/api/auth/token/refresh/", {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       body: JSON.stringify({ refresh: refreshToken }),
+  //     });
+
+  //     if (!response.ok) throw new Error("Failed to refresh token");
+
+  //     const data = await response.json();
+  //     localStorage.setItem("accessToken", data.access);
+  //     console.log("Token refreshed successfully");
+  //     return data.access;
+  //   } catch (err) {
+  //     console.error("Failed to refresh token:", err);
+  //     handleLogout(); 
+  //     return null;
+  //   }
+  // };
 
   // ✅ Handle Logout
   const handleLogout = () => {
@@ -85,6 +180,7 @@ const Dashboard = () => {
     localStorage.removeItem("profile_picture");
     navigate("/login");
   };
+  
 
   // ✅ Delete Blog
   const handleDelete = async (id) => {

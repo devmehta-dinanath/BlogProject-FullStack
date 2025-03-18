@@ -43,9 +43,12 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware', 
     'django.middleware.security.SecurityMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
+    
     # 'allauth.account.middleware.AuthenticationMiddleware',
+   
+    'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -154,12 +157,11 @@ ALLOWED_HOSTS = ["127.0.0.1", "localhost"] #for email verificain link
 
 # ✅ Allow CORS requests
 CORS_ALLOW_ALL_ORIGINS = True
-
+CORS_ALLOW_CREDENTIALS = True
 # ✅ CSRF Configuration (for development only)
 CSRF_TRUSTED_ORIGINS = ['http://127.0.0.1:5173', 'http://localhost:5173']
 
 
-CORS_ALLOW_ALL_ORIGINS = True  
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
@@ -209,11 +211,16 @@ AUTHENTICATION_BACKENDS = [
     'Blog_app.authentication.CustomAuthBackend',  # ✅ Custom backend
     'django.contrib.auth.backends.ModelBackend',
 ]
+
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication', # ✅ JWT-based authentication
-    ),
-    'DEFAULT_PERMISSION_CLASSES': (
+    'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.AllowAny',  # ✅ Allow public access unless overridden
-    )
+    ],
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+    ],
 }
+
+
+CSRF_TRUSTED_ORIGINS = ['http://localhost:5173', 'http://127.0.0.1:5173']
