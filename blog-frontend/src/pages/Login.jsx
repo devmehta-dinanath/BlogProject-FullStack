@@ -5,72 +5,15 @@ import { Link, useNavigate } from "react-router-dom";
 const Login = ({ setUser }) => {
   const [formData, setFormData] = useState({ login_field: "", password: "" });
   const [error, setError] = useState("");
+  const [showResendLink, setShowResendLink] = useState(false);
   const navigate = useNavigate();
 
   // ✅ Handle form input changes
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  // // ✅ Handle form submission
-  // const handleSubmit = async (e) => {
-  //   e.preventDefault();
-  //   setError("");
-  //   try {
-  //     const response = await fetch("http://127.0.0.1:8000/api/auth/login/", {
-  //       method: "POST",
-  //       headers: {
-  //         "Content-Type": "application/json"
-  //       },
-  //       body: JSON.stringify(formData)
-  //     });
-  
-  //     if (response.status === 200) {
-  //       const data = await response.json();
-  
-  //       // ✅ Store tokens in localStorage
-  //       localStorage.setItem("accessToken", data.access_token);
-  //       localStorage.setItem("refreshToken", data.refresh_token);
-  
-  //       // ✅ Store full user data in localStorage
-  //       const userData = {
-  //         id: data.user.id,
-  //         username: data.user.username,
-  //         email: data.user.email,
-  //         phone: data.user.phone || "",
-  //         profile_picture: data.user.profile_picture || null,
-  //         first_name: data.user.first_name || "",
-  //         last_name: data.user.last_name || "",
-  //       };
-  
-  //       console.log("User Data:", userData); //  Debugging
-  
-  //       localStorage.setItem("user", JSON.stringify(userData));
-  //       localStorage.setItem("authorId", userData.id);  // Store authorId separately
-  //       if (userData.profile_picture) {
-  //         localStorage.setItem("profile_picture", userData.profile_picture);
-  //       }
-
-        
-  
-  //       // ✅ Update state
-  //       setUser(userData);
-  
-  //       navigate("/"); // ✅ Redirect to home
-  //     } else {
-  //       const errorData = await response.json();
-  //       setError(errorData.detail || "Login failed. Please try again.");
-  //     }
-  //   } catch (error) {
-  //     console.error("Login error:", error);
-  //     setError("Something went wrong. Please try again.");
-  //   }
-    
-  // };
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
-  
+    setShowResendLink(false); // ✅ Reset resend link state
+    
     try {
       const response = await fetch("http://127.0.0.1:8000/api/auth/login/", {
         method: "POST",
@@ -80,68 +23,103 @@ const Login = ({ setUser }) => {
         body: JSON.stringify(formData),
       });
   
-      if (response.ok) {
-        let data;
-        try {
-          data = await response.json(); // ✅ Handle bad JSON response
-        } catch (jsonError) {
-          throw new Error("Invalid server response");
-        }
+      const data = await response.json();
+      console.log("Raw response:", data); // ✅ Debugging log
   
-        // ✅ Store tokens in localStorage
+      if (response.ok) {
+        console.log("Login successful:", data); // ✅ Log for debugging
+  
+        // ✅ Store tokens and user data
         localStorage.setItem("accessToken", data?.access_token);
         localStorage.setItem("refreshToken", data?.refresh_token);
+        localStorage.setItem("user", JSON.stringify(data?.user));
+        localStorage.setItem("authorId", data?.user?.id);
   
-        // ✅ Build user data object
-        const userData = {
-          id: data?.user?.id || null,
-          username: data?.user?.username || "",
-          email: data?.user?.email || "",
-          phone: data?.user?.phone || "",
-          profile_picture: data?.user?.profile_picture || null,
-          first_name: data?.user?.first_name || "",
-          last_name: data?.user?.last_name || "",
-        };
-  
-        console.log("User Data:", userData); // ✅ Debugging
-  
-        // ✅ Store full user data in localStorage
-        localStorage.setItem("user", JSON.stringify(userData));
-        localStorage.setItem("authorId", userData.id);
-  
-        if (userData.profile_picture) {
-          localStorage.setItem("profile_picture", userData.profile_picture);
+        if (data?.user?.profile_picture) {
+          localStorage.setItem("profile_picture", data.user.profile_picture);
         }
   
-        // ✅ Update state immediately
-        setUser(userData);
-  
-        // ✅ Use navigate after state is updated to avoid race condition
-        navigate("/");
+        setUser(data.user); // ✅ Update user state
+        navigate("/dashboard");
       } else {
-        const errorData = await response.json().catch(() => ({
-          detail: "Login failed. Please try again.",
-        }));
-        setError(errorData?.detail || "Login failed. Please try again.");
+        // ✅ Handle `non_field_errors` and other error cases
+        if (data?.non_field_errors) {
+          setError(data.non_field_errors[0]);
+  
+          // ✅ If the error is related to email verification, show resend link
+          if (data.non_field_errors[0] === "Please verify your email first.") {
+            setShowResendLink(true);
+          }
+        } else {
+          setError(data?.detail || "Login failed. Please try again.");
+        }
       }
-    } catch (error) {
-      console.error("Login error:", error);
+    } catch (err) {
+      console.error("Login error:", err);
       setError("Something went wrong. Please try again.");
     }
   };
+  
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
 
-  
-  
+
+const resendVerificationLink = async () => {
+  try {
+      let email = formData.login_field;
+
+      // ✅ Check if login_field is email, phone, or username
+      if (!email.includes("@")) {
+          const response = await fetch(`http://127.0.0.1:8000/api/auth/get-email/`, {
+              method: "POST",
+              headers: {
+                  "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ login_field: formData.login_field }),
+          });
+
+          const data = await response.json();
+          if (response.ok) {
+              email = data.email; // ✅ Use the extracted email
+          } else {
+              throw new Error(data.error || "Failed to retrieve email.");
+          }
+      }
+
+      // ✅ Send the email to resend verification
+      const response = await fetch("http://127.0.0.1:8000/api/auth/resend-verification-email/", {
+          method: "POST",
+          headers: {
+              "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email }),
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+          alert("Verification link sent. Please check your email.");
+          setShowResendLink(false);
+      } else {
+          setError(data.error || "Failed to send verification link.");
+      }
+  } catch (error) {
+      console.error("Resend verification link error:", error);
+      setError("Something went wrong. Please try again.");
+  }
+};
+
+
+
+
   return (
     <div className="flex justify-center items-center h-screen bg-gray-100">
       <div className="bg-white p-6 rounded-lg shadow-lg w-96">
         <h2 className="text-2xl font-bold text-center text-gray-800">Login</h2>
-        
-        {/* ✅ Error message */}
+
         {error && <p className="text-red-500 text-center mt-2">{error}</p>}
 
         <form className="mt-4" onSubmit={handleSubmit}>
-          {/* ✅ Email/Username Input */}
           <input
             type="text"
             name="login_field"
@@ -151,8 +129,6 @@ const Login = ({ setUser }) => {
             onChange={handleChange}
             required
           />
-
-          {/* ✅ Password Input */}
           <input
             type="password"
             name="password"
@@ -162,8 +138,6 @@ const Login = ({ setUser }) => {
             onChange={handleChange}
             required
           />
-
-          {/* ✅ Login Button */}
           <button
             type="submit"
             className="w-full bg-blue-500 text-white py-2 rounded-lg mt-4 hover:bg-blue-600 transition"
@@ -172,25 +146,32 @@ const Login = ({ setUser }) => {
           </button>
         </form>
 
-        {/* ✅ Forgot Password */}
+        {error && <p className="text-red-500 text-center mt-2">{error}</p>}
+
+{/* ✅ Resend Verification Link */}
+{showResendLink && (
+  <div className="mt-4 text-center">
+    <p className="text-sm text-gray-600">
+      Didn't receive the verification email?{" "}
+      <button
+        onClick={resendVerificationLink}
+        className="text-blue-600 hover:underline"
+      >
+        Resend Verification Link
+      </button>
+    </p>
+  </div>
+)}
+
+
         <div className="mt-4 text-center">
           <Link to="/forgot-password" className="text-blue-600 hover:underline">
             Forgot Password?
           </Link>
         </div>
-
-        {/* ✅ Register Link */}
-        <p className="mt-4 text-center">
-          Don't have an account?{" "}
-          <Link to="/register" className="text-blue-600 hover:underline">
-            Sign up
-          </Link>
-        </p>
       </div>
     </div>
   );
 };
 
 export default Login;
-
-

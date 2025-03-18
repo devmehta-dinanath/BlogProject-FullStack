@@ -190,14 +190,7 @@ CORS_ALLOW_HEADERS = [
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
-REST_FRAMEWORK = {
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated',
-    ],
-    'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
-    ],
-}
+
 
 
 from datetime import timedelta
@@ -211,4 +204,16 @@ SIMPLE_JWT = {
     'ALGORITHM': 'HS256',                            # Encryption algorithm
     'SIGNING_KEY': SECRET_KEY,                       # Use your Django SECRET_KEY
     'AUTH_HEADER_TYPES': ('Bearer',),                # Authorization header prefix
+}
+AUTHENTICATION_BACKENDS = [
+    'Blog_app.authentication.CustomAuthBackend',  # ✅ Custom backend
+    'django.contrib.auth.backends.ModelBackend',
+]
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication', # ✅ JWT-based authentication
+    ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.AllowAny',  # ✅ Allow public access unless overridden
+    )
 }

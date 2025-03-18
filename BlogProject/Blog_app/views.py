@@ -60,6 +60,76 @@ class VerifyEmailView(APIView):
 
 
 # ✅ Login View (Restored)
+
+
+# class LoginView(APIView):
+#     permission_classes = [AllowAny]
+
+#     def post(self, request):
+#         print("Incoming login data:", request.data)  # ✅ Debugging log
+#         serializer = UserLoginSerializer(data=request.data)
+#         if serializer.is_valid():
+#             user = serializer.validated_data['user']
+#             if user.is_verified:
+#                 # ✅ Generate JWT tokens using RefreshToken class
+#                 refresh_token = RefreshToken.for_user(user)
+#                 access_token = str(refresh_token.access_token)
+
+#                 return Response({
+#                     "access_token": access_token,
+#                     "refresh_token": str(refresh_token),
+#                     "user": {
+#                         "id": user.id,
+#                         "username": user.username,
+#                         "email": user.email,
+#                         "profile_picture": user.profile_picture.url if user.profile_picture else None
+#                     }
+#                 }, status=status.HTTP_200_OK)
+#             return Response({"error": "Please verify your email first."}, status=status.HTTP_400_BAD_REQUEST)
+#         else:
+#             print("Login serializer errors:", serializer.errors)  # ✅ Debugging log
+#             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+from rest_framework.permissions import AllowAny
+from rest_framework_simplejwt.tokens import RefreshToken
+from django.contrib.auth import authenticate
+from rest_framework.response import Response
+from rest_framework import status
+from rest_framework.views import APIView
+from .serializers import UserLoginSerializer, UserProfileSerializer
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
+
+@method_decorator(csrf_exempt, name="dispatch")
+class LoginView(APIView):
+    permission_classes = [AllowAny]  # ✅ Allow login without authentication
+    
+    def post(self, request):
+        serializer = UserLoginSerializer(data=request.data)
+        if serializer.is_valid():
+            user = serializer.validated_data["user"]
+
+            # ✅ Generate tokens using SimpleJWT
+            refresh = RefreshToken.for_user(user)
+            access_token = str(refresh.access_token)
+            refresh_token = str(refresh)
+
+            user_data = UserProfileSerializer(user).data
+
+            return Response(
+                {
+                    "access_token": access_token,
+                    "refresh_token": refresh_token,
+                    "user": user_data
+                },
+                status=status.HTTP_200_OK
+            )
+        return Response(serializer.errors, status=status.HTTP_401_UNAUTHORIZED)
+
+
+
+
+
 # class LoginView(APIView):
 #     permission_classes = [AllowAny]
 
@@ -68,51 +138,72 @@ class VerifyEmailView(APIView):
 #         if serializer.is_valid():
 #             user = serializer.validated_data['user']
 #             if user.is_verified:
-#                 login(request, user)
-#                 access_token = user.tokens()['access']
-#                 refresh_token = user.tokens()['refresh']
+#                 refresh_token = RefreshToken.for_user(user)
+#                 access_token = str(refresh_token.access_token)
+
 #                 return Response({
-#                     "access": access_token,
-#                     "refresh": refresh_token,
+#                     "access_token": access_token,
+#                     "refresh_token": str(refresh_token),
 #                     "user": {
 #                         "id": user.id,
 #                         "username": user.username,
 #                         "email": user.email,
 #                         "profile_picture": user.profile_picture.url if user.profile_picture else None
 #                     }
-#                 })
-#             return Response({"error": "Please verify your email first."}, status=status.HTTP_400_BAD_REQUEST)
+#                 }, status=status.HTTP_200_OK)
+#             else:
+#                 # ✅ Return error and a flag to allow resending verification
+#                 return Response(
+#                     {"error": "Please verify your email first.", "user_inactive": True},
+#                     status=status.HTTP_400_BAD_REQUEST
+#                 )
 #         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-from rest_framework_simplejwt.tokens import RefreshToken
 
-class LoginView(APIView):
+# ✅ Resend Verification Email View
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
+
+@method_decorator(csrf_exempt, name='dispatch')
+class ResendVerificationEmailView(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request):
-        print("Incoming login data:", request.data)  # ✅ Debugging log
-        serializer = UserLoginSerializer(data=request.data)
-        if serializer.is_valid():
-            user = serializer.validated_data['user']
-            if user.is_verified:
-                # ✅ Generate JWT tokens using RefreshToken class
-                refresh_token = RefreshToken.for_user(user)
-                access_token = str(refresh_token.access_token)
+        email = request.data.get('email')
+        try:
+            user = User.objects.get(email=email)
+            if not user.is_verified:
+                uid = urlsafe_base64_encode(force_bytes(user.pk))
+                token = default_token_generator.make_token(user)
+                verify_link = f"{settings.FRONTEND_URL}/verify-email/{uid}/{token}/"
+                send_mail(
+                    "Verify Your Email",
+                    f"Click the link to verify your email: {verify_link}",
+                    settings.EMAIL_HOST_USER,
+                    [user.email],
+                    fail_silently=False
+                )
+                return Response({"message": "Verification link sent successfully."}, status=status.HTTP_200_OK)
+            return Response({"error": "Email is already verified."}, status=status.HTTP_400_BAD_REQUEST)
+        except User.DoesNotExist:
+            return Response({"error": "No user found with this email."}, status=status.HTTP_400_BAD_REQUEST)
+        
+class GetEmailView(APIView):
+    permission_classes = [AllowAny]
 
-                return Response({
-                    "access_token": access_token,
-                    "refresh_token": str(refresh_token),
-                    "user": {
-                        "id": user.id,
-                        "username": user.username,
-                        "email": user.email,
-                        "profile_picture": user.profile_picture.url if user.profile_picture else None
-                    }
-                }, status=status.HTTP_200_OK)
-            return Response({"error": "Please verify your email first."}, status=status.HTTP_400_BAD_REQUEST)
+    def post(self, request):
+        login_field = request.data.get("login_field")
+
+        user = None
+        if "@" in login_field:
+            user = User.objects.filter(email=login_field).first()
+        elif login_field.isdigit():
+            user = User.objects.filter(phone=login_field).first()
         else:
-            print("Login serializer errors:", serializer.errors)  # ✅ Debugging log
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            user = User.objects.filter(username=login_field).first()
 
+        if user:
+            return Response({"email": user.email}, status=status.HTTP_200_OK)
+        return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
 
 # ✅ Logout View (Restored)
 class LogoutView(APIView):
@@ -257,25 +348,6 @@ class PasswordResetConfirmView(APIView):
             return Response({"error": "Invalid token"}, status=status.HTTP_400_BAD_REQUEST)
 
 
-# # ✅ List Comments View (Fixed)
-# class ListCommentsView(generics.ListAPIView):
-#     serializer_class = CommentSerializer
-#     permission_classes = [permissions.AllowAny]
-
-#     def get_queryset(self):
-#         blog_id = self.kwargs.get('blog_id')
-#         return Comment.objects.filter(blog_id=blog_id)
-
-
-# # ✅ Create Comment View (Fixed)
-# class CreateCommentView(generics.CreateAPIView):
-#     serializer_class = CommentSerializer
-#     permission_classes = [IsAuthenticated]
-
-#     def perform_create(self, serializer):
-#         blog_id = self.kwargs.get('blog_id')
-#         blog = get_object_or_404(BlogPost, pk=blog_id)
-#         serializer.save(author=self.request.user, blog=blog)
 from rest_framework import generics, permissions, status
 from rest_framework.response import Response
 from rest_framework.views import APIView

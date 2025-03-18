@@ -35,27 +35,62 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         )
         return user
 
+from django.contrib.auth import authenticate
+from django.contrib.auth import get_user_model
+from rest_framework import serializers
+from django.contrib.auth import authenticate
+from django.contrib.auth import get_user_model
+from rest_framework import serializers
 
-# ✅ User Login Serializer (Restored)
+User = get_user_model()
+
 class UserLoginSerializer(serializers.Serializer):
-    login_field = serializers.CharField()
-    password = serializers.CharField(write_only=True)
+    login_field = serializers.CharField(required=True)
+    password = serializers.CharField(write_only=True, required=True)
 
     def validate(self, data):
         login_field = data.get("login_field")
         password = data.get("password")
 
-        user = None
-        if "@" in login_field:
-            user = User.objects.filter(email=login_field).first()
-        elif login_field.isdigit():
-            user = User.objects.filter(phone=login_field).first()
-        else:
-            user = User.objects.filter(username=login_field).first()
+        if not login_field:
+            raise serializers.ValidationError("Login field is required.")
+        if not password:
+            raise serializers.ValidationError("Password is required.")
 
-        if user and user.check_password(password):
+        # ✅ Authenticate using the custom backend
+        user = authenticate(username=login_field, password=password)
+
+        if user:
+            if not user.is_active:
+                raise serializers.ValidationError("This account is inactive. Please contact support.")
+            if not user.is_verified:
+                raise serializers.ValidationError("Please verify your email first.")
             return {"user": user}
+
         raise serializers.ValidationError("Invalid credentials.")
+
+
+
+# ✅ User Login Serializer (Restored)
+# class UserLoginSerializer(serializers.Serializer):
+#     login_field = serializers.CharField()
+#     password = serializers.CharField(write_only=True)
+
+#     def validate(self, data):
+#         login_field = data.get("login_field")
+#         password = data.get("password")
+
+#         user = None
+#         if "@" in login_field:
+#             user = User.objects.filter(email=login_field).first()
+#         elif login_field.isdigit():
+#             user = User.objects.filter(phone=login_field).first()
+#         else:
+#             user = User.objects.filter(username=login_field).first()
+
+#         if user and user.check_password(password):
+#             return {"user": user}
+#         raise serializers.ValidationError("Invalid credentials.")
 
 
 # ✅ User Profile Serializer (Restored)

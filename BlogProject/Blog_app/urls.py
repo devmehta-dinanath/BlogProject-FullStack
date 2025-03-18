@@ -3,7 +3,8 @@ from .views import (
     RegisterView, VerifyEmailView, LoginView, LogoutView,
     CreateBlogView, BlogDetailView, BlogDeleteView, UserProfileView,
     YourBlogsView, PasswordResetRequestView, PasswordResetConfirmView,
-    CreateCommentView, ListCommentsView, DeleteCommentView
+    CreateCommentView, ListCommentsView, DeleteCommentView,ResendVerificationEmailView,
+    GetEmailView
 )
 
 urlpatterns = [
@@ -13,6 +14,8 @@ urlpatterns = [
     path('auth/verify-email/<uid>/<token>/', VerifyEmailView.as_view(), name='verify-email'),
     path('auth/password-reset/', PasswordResetRequestView.as_view(), name='password_reset_request'),
     path('auth/password-reset/<uidb64>/<token>/', PasswordResetConfirmView.as_view(), name='password_reset_confirm'),
+    path('auth/resend-verification-email/', ResendVerificationEmailView.as_view(), name='resend-verification-email'),
+    path('auth/get-email/', GetEmailView.as_view(), name='get-email'),
 
     path('blogs/', CreateBlogView.as_view(), name='create-blog'),
     path('blogs/<int:pk>/', BlogDetailView.as_view(), name='blog-detail'),
