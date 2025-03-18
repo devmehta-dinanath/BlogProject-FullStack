@@ -280,10 +280,10 @@ const Dashboard = () => {
                   className="text-gray-700 text-3xl cursor-pointer hover:text-blue-500 transition transform hover:scale-110"
                   onClick={() => navigate(`/blogs/${blog.id}`)}
                 />
-                <FiEdit
+                {/* <FiEdit
                   className="text-gray-700 text-3xl cursor-pointer hover:text-green-500 transition transform hover:scale-110"
                   onClick={() => navigate(`/blogs/edit/${blog.id}`)}
-                />
+                /> */}
                 <FiTrash
                   className="text-gray-700 text-3xl cursor-pointer hover:text-red-500 transition transform hover:scale-110"
                   onClick={() => handleDelete(blog.id)}
