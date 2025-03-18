@@ -50,7 +50,10 @@ function App() {
 
   // ✅ Hide Navbar on specific routes
   const hideNavbar =
-    location.pathname === "/login" || location.pathname.startsWith("/verify-email");
+    location.pathname === "/login" ||
+    location.pathname.startsWith("/verify-email") ||
+    location.pathname === "/forgot-password" ||
+    location.pathname.includes("/reset-password");
 
   return (
     <>
@@ -71,12 +74,9 @@ function App() {
         <Route path="/profile" element={<Profile user={user} setUser={updateUser} />} />
         <Route path="/yourblog" element={<YourBlogs/>}/>
         <Route path="/blogs/:id" element={<BlogDetail />} />
-        
       </Routes>
     </>
   );
 }
 
 export default App;
-
-
