@@ -401,17 +401,36 @@ class DeleteCommentView(generics.DestroyAPIView):
         return Response({"detail": "Comment deleted successfully."}, status=status.HTTP_204_NO_CONTENT)
 
 
-from rest_framework import generics, permissions
+# from rest_framework import generics, permissions
+# from .models import BlogPost
+# from .serializers import BlogPostSerializer
+
+# class BlogListView(generics.ListCreateAPIView):
+#     queryset = BlogPost.objects.all()
+#     serializer_class = BlogPostSerializer
+    
+#     def get_permissions(self):
+#         if self.request.method == 'GET':
+#             return [permissions.AllowAny()]  # ✅ Allow unauthenticated GET requests
+#         return [permissions.IsAuthenticated()]
+
+
+from rest_framework import generics, permissions, pagination
 from .models import BlogPost
 from .serializers import BlogPostSerializer
 
+# ✅ Custom Pagination Class
+class BlogPagination(pagination.PageNumberPagination):
+    page_size = 3  # ✅ Number of blogs per page
+    page_size_query_param = 'page_size'
+    max_page_size = 10
+
 class BlogListView(generics.ListCreateAPIView):
-    queryset = BlogPost.objects.all()
+    queryset = BlogPost.objects.all().order_by('-created_at')
     serializer_class = BlogPostSerializer
+    pagination_class = BlogPagination
     
     def get_permissions(self):
         if self.request.method == 'GET':
             return [permissions.AllowAny()]  # ✅ Allow unauthenticated GET requests
         return [permissions.IsAuthenticated()]
-
-

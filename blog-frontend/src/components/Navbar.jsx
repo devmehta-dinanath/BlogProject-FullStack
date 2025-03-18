@@ -158,7 +158,7 @@ const Navbar = ({ user, setUser }) => {
           <Link to="/dashboard" className="block hover:text-gray-300">Blogs</Link>
           {user && (
             <>
-              <Link to="/your-blogs" className="block hover:text-gray-300">
+              <Link to="/yourblog" className="block hover:text-gray-300">
                 Your Blogs
               </Link>
               <Link to="/create-blog" className="block hover:text-gray-300">

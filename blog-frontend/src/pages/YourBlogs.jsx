@@ -105,11 +105,7 @@ const YourBlogs = () => {
                   onClick={() => handleDelete(blog.id)}
                 />
 
-                {/* ✅ Comment Icon */}
-                <FiMessageCircle
-                  className="text-gray-700 text-3xl cursor-pointer hover:text-yellow-500 transition transform hover:scale-110"
-                  onClick={() => navigate(`/blogs/${blog.id}/comments`)}
-                />
+                
               </div>
 
               {/* ✅ Blog Content */}
@@ -134,6 +130,7 @@ const YourBlogs = () => {
           ))}
         </div>
       )}
+      
     </div>
   );
 };

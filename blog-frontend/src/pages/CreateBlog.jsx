@@ -1,7 +1,7 @@
-
-
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const CreateBlog = () => {
   const [title, setTitle] = useState('');
@@ -15,9 +15,9 @@ const CreateBlog = () => {
 
   useEffect(() => {
     const storedAuthorId = localStorage.getItem('authorId') || sessionStorage.getItem('authorId');
-    console.log("Fetched Author ID:", storedAuthorId); // Debugging log
+    console.log("Fetched Author ID:", storedAuthorId); // ✅ Debugging log
     if (storedAuthorId) {
-      setAuthorId(storedAuthorId);
+      setAuthorId(parseInt(storedAuthorId)); // ✅ Convert to integer
     }
   }, []);
 
@@ -43,7 +43,7 @@ const CreateBlog = () => {
     const formData = new FormData();
     formData.append('title', title);
     formData.append('content', content);
-    formData.append('author_id', authorId); // ✅ Send author_id in formData
+    formData.append('author_id', authorId); // ✅ Send author_id as integer
     if (image) {
       formData.append('image', image);
     }
@@ -58,17 +58,22 @@ const CreateBlog = () => {
       });
 
       if (!response.ok) {
-        const errorMessage = await response.text();
-        console.error('Error creating blog:', errorMessage);
-        setError(`Failed to create blog: ${errorMessage}`);
+        const errorData = await response.json();
+        console.error('Error creating blog:', errorData);
+        setError(`Failed to create blog: ${errorData?.detail || "Invalid data"}`);
+        toast.error(`❌ ${errorData?.detail || "Failed to create blog"}`);
         return;
       }
 
+      // ✅ Show Success Message
+      toast.success("✅ Blog created successfully!");
+
       // ✅ Redirect to dashboard after success
-      navigate('/dashboard');
+      setTimeout(() => navigate('/dashboard'), 1500);
     } catch (err) {
       console.error('Network error:', err);
       setError('Network error while creating blog');
+      toast.error("❌ Network error while creating blog");
     }
   };
 
@@ -130,4 +135,3 @@ const CreateBlog = () => {
 };
 
 export default CreateBlog;
-
