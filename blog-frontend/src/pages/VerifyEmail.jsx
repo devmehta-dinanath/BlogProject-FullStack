@@ -8,7 +8,7 @@ const VerifyEmail = () => {
 
   useEffect(() => {
     const verifyEmail = async () => {
-      console.log("Verifying email with:", uid, token); // ✅ Debugging
+      // console.log("Verifying email with:", uid, token); //  Debugging
 
       try {
         const response = await fetch(
@@ -23,18 +23,18 @@ const VerifyEmail = () => {
 
         if (response.ok) {
           const data = await response.json();
-          console.log("Verification success:", data); // ✅ Debugging
+          // console.log("Verification success:", data); //  Debugging
 
           setMessage("✅ Email verified. Redirecting to login...");
           setTimeout(() => navigate("/login"), 1000); // Redirect to login after 1 sec
         } else {
           const errorData = await response.json();
-          console.error("Verification error:", errorData); // ✅ Debugging
+          // console.error("Verification error:", errorData); //  Debugging
 
           setMessage("❌ Verification failed. Link may be invalid or expired.");
         }
       } catch (error) {
-        console.error("Fetch error:", error); // ✅ Debugging
+        // console.error("Fetch error:", error); //  Debugging
         setMessage("❌ An error occurred. Please try again later.");
       }
     };

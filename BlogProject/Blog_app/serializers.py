@@ -2,11 +2,13 @@ from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from django.contrib.auth import authenticate
 from .models import BlogPost, Comment
+from .models import User
+
 
 User = get_user_model()
 
 
-# ✅ User Registration Serializer (Restored)
+# Registration Serializer
 class UserRegistrationSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
 
@@ -35,17 +37,9 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         )
         return user
 
-from django.contrib.auth import authenticate
-from django.contrib.auth import get_user_model
-from rest_framework import serializers
-from django.contrib.auth import authenticate
-from django.contrib.auth import get_user_model
-from rest_framework import serializers
-
-User = get_user_model()
-
+# login Serializer
 class UserLoginSerializer(serializers.Serializer):
-    id = serializers.IntegerField(read_only=True)  # ✅ Add id
+    id = serializers.IntegerField(read_only=True)  
     login_field = serializers.CharField(required=True)
     password = serializers.CharField(write_only=True, required=True)
 
@@ -58,7 +52,7 @@ class UserLoginSerializer(serializers.Serializer):
         if not password:
             raise serializers.ValidationError("Password is required.")
 
-        # ✅ Authenticate using the custom backend
+        #  Authenticate using the custom backend
         user = authenticate(username=login_field, password=password)
 
         if user:
@@ -70,47 +64,7 @@ class UserLoginSerializer(serializers.Serializer):
 
         raise serializers.ValidationError("Invalid credentials.")
 
-
-
-# ✅ User Login Serializer (Restored)
-# class UserLoginSerializer(serializers.Serializer):
-#     login_field = serializers.CharField()
-#     password = serializers.CharField(write_only=True)
-
-#     def validate(self, data):
-#         login_field = data.get("login_field")
-#         password = data.get("password")
-
-#         user = None
-#         if "@" in login_field:
-#             user = User.objects.filter(email=login_field).first()
-#         elif login_field.isdigit():
-#             user = User.objects.filter(phone=login_field).first()
-#         else:
-#             user = User.objects.filter(username=login_field).first()
-
-#         if user and user.check_password(password):
-#             return {"user": user}
-#         raise serializers.ValidationError("Invalid credentials.")
-
-
-# ✅ User Profile Serializer (Restored)
-# class UserProfileSerializer(serializers.ModelSerializer):
-#     profile_picture = serializers.SerializerMethodField()
-
-#     class Meta:
-#         model = User
-#         fields = ['id', 'username', 'email', 'first_name', 'last_name', 'phone', 'profile_picture']
-
-#     def get_profile_picture(self, obj):
-#         request = self.context.get('request')
-#         if obj.profile_picture:
-#             return request.build_absolute_uri(obj.profile_picture.url)
-        # return None
-        
-from rest_framework import serializers
-from .models import User
-
+# profile Serilizer
 class UserProfileSerializer(serializers.ModelSerializer):
     profile_picture = serializers.ImageField(required=False)
     class Meta:
@@ -124,7 +78,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
         instance.email = validated_data.get('email', instance.email)
         instance.phone = validated_data.get('phone', instance.phone)
 
-        # ✅ Handle profile picture update
+        # Handle profile picture update
         profile_picture = validated_data.get('profile_picture', None)
         if profile_picture:
             instance.profile_picture = profile_picture
@@ -133,7 +87,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
         return instance
 
 
-# ✅ Password Reset Request Serializer (Restored)
+#  Password Reset Request Serializer
 class PasswordResetRequestSerializer(serializers.Serializer):
     email = serializers.EmailField()
 
@@ -145,7 +99,7 @@ class PasswordResetRequestSerializer(serializers.Serializer):
         return data
 
 
-# ✅ Password Reset Confirm Serializer (Restored)
+# Password Reset Confirm Serializer 
 class PasswordResetConfirmSerializer(serializers.Serializer):
     new_password = serializers.CharField(write_only=True)
     confirm_password = serializers.CharField(write_only=True)
@@ -155,52 +109,11 @@ class PasswordResetConfirmSerializer(serializers.Serializer):
             raise serializers.ValidationError("Passwords do not match.")
         return data
 
-
-# ✅ Blog Post Serializer (Restored)
-# class BlogPostSerializer(serializers.ModelSerializer):
-#     author = serializers.CharField(source='author.username', read_only=True)
-#     author_id = serializers.IntegerField(write_only=True)
-#     image = serializers.SerializerMethodField()
-#     created_at = serializers.DateTimeField(read_only=True)
-
-#     class Meta:
-#         model = BlogPost
-#         fields = ['id', 'title', 'content', 'image', 'author', 'author_id', 'created_at']
-
-#     def get_image(self, obj):
-#         request = self.context.get('request')
-#         if obj.image:
-#             return request.build_absolute_uri(obj.image.url)
-#         return None
-
-
-from rest_framework import serializers
-from .models import BlogPost, Comment
-
-# class BlogPostSerializer(serializers.ModelSerializer):
-#     author = serializers.CharField(source='author.username', read_only=True)
-#     author_id = serializers.IntegerField(write_only=True)
-#     image = serializers.SerializerMethodField()
-#     created_at = serializers.DateTimeField(read_only=True)
-#     comments = serializers.SerializerMethodField()
-
-#     class Meta:
-#         model = BlogPost
-#         fields = ['id', 'title', 'content', 'image', 'author', 'author_id', 'created_at', 'comments']
-
-#     def get_image(self, obj):
-#         request = self.context.get('request')  # ✅ Get request context
-#         if obj.image:
-#             # ✅ Build absolute URI for the image
-#             return request.build_absolute_uri(obj.image.url)
-#         return None
-from rest_framework import serializers
-from .models import BlogPost, Comment
-
+# Blog post serializer
 class BlogPostSerializer(serializers.ModelSerializer):
     author = serializers.CharField(source='author.username', read_only=True)
     author_id = serializers.IntegerField(write_only=True)
-    image = serializers.ImageField(required=False)  # ✅ Use ImageField instead of SerializerMethodField
+    image = serializers.ImageField(required=False)  
     created_at = serializers.DateTimeField(read_only=True)
     comments = serializers.SerializerMethodField()
 
@@ -213,7 +126,7 @@ class BlogPostSerializer(serializers.ModelSerializer):
         return CommentSerializer(comments, many=True).data
     
     def create(self, validated_data):
-        # ✅ Handle file upload and create BlogPost
+        # Handle file upload and create BlogPost
         author_id = validated_data.pop('author_id')
         user = self.context['request'].user
 
@@ -231,40 +144,7 @@ class BlogPostSerializer(serializers.ModelSerializer):
     def get_comment_count(self, obj):
         return obj.comments.count()
 
-# from .models import BlogPost, Comment
-
-# class BlogPostSerializer(serializers.ModelSerializer):
-#     author = serializers.CharField(source='author.username', read_only=True)
-#     author_id = serializers.IntegerField(write_only=True)
-#     image = serializers.SerializerMethodField()
-#     created_at = serializers.DateTimeField(read_only=True)
-#     comments = serializers.SerializerMethodField()
-
-#     class Meta:
-#         model = BlogPost
-#         fields = ['id', 'title', 'content', 'image', 'author', 'author_id', 'created_at', 'comments']
-
-#     def get_image(self, obj):
-#         request = self.context.get('request')
-#         if obj.image:
-#             # ✅ Build absolute URI for the image
-#             return request.build_absolute_uri(obj.image.url)
-#         return None
-    
-#     def get_comments(self, obj):
-#         comments = obj.comments.all()
-#         return CommentSerializer(comments, many=True).data
-
-
-# class CommentSerializer(serializers.ModelSerializer):
-#     author = serializers.ReadOnlyField(source='author.username')
-
-#     class Meta:
-#         model = Comment
-#         fields = ['id', 'author', 'content', 'created_at']
-
-
-# ✅ Blog Detail Serializer (Restored)
+#  Blog Detail Serializer
 class BlogDetailSerializer(serializers.ModelSerializer):
     author = serializers.CharField(source='author.username', read_only=True)
     image = serializers.SerializerMethodField()
@@ -284,26 +164,7 @@ class BlogDetailSerializer(serializers.ModelSerializer):
         comments = obj.comments.all()
         return CommentSerializer(comments, many=True).data
 
-
-# ✅ Comment Serializer (Fixed for GET + POST)
-# class CommentSerializer(serializers.ModelSerializer):
-#     author = serializers.ReadOnlyField(source='author.username')
-
-#     class Meta:
-#         model = Comment
-#         fields = ['id', 'author', 'content', 'created_at']
-
-#     def create(self, validated_data):
-#         request = self.context.get('request')
-#         validated_data['author'] = request.user
-#         return Comment.objects.create(**validated_data)
-
-from rest_framework import serializers
-from .models import Comment
-
-from rest_framework import serializers
-from .models import Comment
-
+# comment
 class CommentSerializer(serializers.ModelSerializer):
     author = serializers.ReadOnlyField(source='author.username')
 

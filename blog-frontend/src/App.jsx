@@ -14,9 +14,10 @@ import ResetPassword from './pages/ResetPassword';
 import Profile from './pages/Profile';
 import YourBlogs from './pages/YourBlogs';
 import BlogDetail from './pages/BlogDetail';
+import EditBlog from './pages/EditBlog';
 
 function App() {
-  // ✅ Initialize state with localStorage data
+  //  Initialize state with localStorage data
   const [user, setUser] = useState(() => {
     const storedUser = localStorage.getItem("user");
     return storedUser ? JSON.parse(storedUser) : null;
@@ -24,7 +25,7 @@ function App() {
 
   const location = useLocation();
 
-  // ✅ Sync user state from localStorage on app load
+  //  Sync user state from localStorage on app load
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
     if (storedUser) {
@@ -33,22 +34,22 @@ function App() {
     }
   }, []);
 
-  // ✅ Update user state when profile is updated
+  //  Update user state when profile is updated
   const updateUser = (userData) => {
     setUser(userData);
     localStorage.setItem("user", JSON.stringify(userData));
   };
 
-  // ✅ Handle logout and state reset
+  // Handle logout and state reset
   const handleLogout = () => {
     localStorage.removeItem("accessToken");
     localStorage.removeItem("refreshToken");
     localStorage.removeItem("user");
     setUser(null);
-    window.location.href = "/login"; // ✅ Force reload after logout
+    window.location.href = "/login"; // Force reload after logout
   };
 
-  // ✅ Hide Navbar on specific routes
+  //  Hide Navbar on specific routes
   const hideNavbar =
     location.pathname === "/login" ||
     location.pathname.startsWith("/verify-email") ||
@@ -61,7 +62,6 @@ function App() {
 
       {!hideNavbar && <Navbar user={user} setUser={updateUser} onLogout={handleLogout} />}
 
-      {/* ✅ Pass `user` state to Home */}
       <Routes>
         <Route path="/" element={<Home user={user} />} />
         <Route path="/login" element={<Login setUser={updateUser} />} />
@@ -74,6 +74,7 @@ function App() {
         <Route path="/profile" element={<Profile user={user} setUser={updateUser} />} />
         <Route path="/yourblog" element={<YourBlogs/>}/>
         <Route path="/blogs/:id" element={<BlogDetail />} />
+        <Route path="/blogs/edit/:id" element={<EditBlog />} />
       </Routes>
     </>
   );

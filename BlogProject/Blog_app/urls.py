@@ -4,7 +4,7 @@ from .views import (
     CreateBlogView, BlogDetailView, BlogDeleteView, UserProfileView,
     YourBlogsView, PasswordResetRequestView, PasswordResetConfirmView,
     CreateCommentView, ListCommentsView, DeleteCommentView,ResendVerificationEmailView,
-    GetEmailView,BlogView
+    GetEmailView,BlogView,BlogUpdateView
 )
 
 urlpatterns = [
@@ -18,16 +18,20 @@ urlpatterns = [
     path('auth/get-email/', GetEmailView.as_view(), name='get-email'),
 
     path('blogs/', CreateBlogView.as_view(), name='create-blog'),
-    path('getblogs/', BlogView.as_view(), name='create-blog'),
+    path('getblogs/', BlogView.as_view(), name='create-blog'), 
     path('blogs/<int:pk>/', BlogDetailView.as_view(), name='blog-detail'),
     path('blogs/<int:pk>/delete/', BlogDeleteView.as_view(), name='blog-delete'),
+    path('blogs/<int:pk>/update/', BlogUpdateView.as_view(), name='update-blog'),
+    path('blogs/<int:pk>/update/', BlogUpdateView.as_view(), name='blog-update'),
+
+
 
     path('profile/', UserProfileView.as_view(), name='profile'),
 
-    # ✅ Separate GET and POST for comments
+    # Separate GET and POST for comments
     path('blogs/<int:blog_id>/comments/', ListCommentsView.as_view(), name='list-comments'),
     path('blogs/<int:blog_id>/comments/create/', CreateCommentView.as_view(), name='create-comment'),
-    # ✅ New DELETE endpoint for comments
+    #DELETE endpoint for comments
     path('blogs/<int:blog_id>/comments/<int:comment_id>/', DeleteCommentView.as_view(), name='delete-comment'),
 
     path('your-blogs/', YourBlogsView.as_view(), name='your-blogs'),

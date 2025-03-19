@@ -19,23 +19,23 @@ const Register = () => {
 
   const [showPassword, setShowPassword] = useState(false);
 
-  // ✅ Handle input change
+  // Handle input change
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // ✅ Validate phone number
+  // Validate phone number
   const validatePhoneNumber = (phone) => /^\d{10}$/.test(phone);
 
-  // ✅ Validate email format
+  // Validate email format
   const validateEmail = (email) =>
     /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
-  // ✅ Handle form submission
+  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // ✅ Validation checks
+    // Validation checks
     if (!validatePhoneNumber(formData.phone)) {
       toast.error("Please enter a valid 10-digit phone number.");
       return;
@@ -46,7 +46,7 @@ const Register = () => {
       return;
     }
 
-    // ✅ Show processing toast
+    //  Show processing toast
     const loadingToast = toast.loading("Sending verification link...");
 
     try {
@@ -59,7 +59,7 @@ const Register = () => {
       });
 
       if (!response.ok) {
-        // ✅ Handle HTML error response gracefully
+        // Handle HTML error response gracefully
         const contentType = response.headers.get("content-type");
         if (contentType && contentType.includes("application/json")) {
           const data = await response.json();
@@ -81,13 +81,13 @@ const Register = () => {
         }
       } else {
         toast.update(loadingToast, {
-          render: "✅ Verification link has been sent to your registered email ID.",
+          render: " Verification link has been sent to your registered email ID.",
           type: "success",
           isLoading: false,
           autoClose: 3000
         });
 
-        // ✅ Clear form after success
+        // Clear form after success
         setFormData({
           username: "",
           email: "",
@@ -223,7 +223,7 @@ const Register = () => {
         </p>
       </div>
 
-      {/* ✅ Toast Container */}
+      {/*  Toast Container */}
       <ToastContainer
         position="top-right"
         autoClose={3000}

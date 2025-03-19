@@ -9,7 +9,7 @@ from .models import User, BlogPost, Comment
 from .serializers import (
     UserRegistrationSerializer, UserLoginSerializer, UserProfileSerializer,
     PasswordResetRequestSerializer, PasswordResetConfirmSerializer,
-    BlogPostSerializer, BlogDetailSerializer, CommentSerializer
+    BlogPostSerializer, BlogDetailSerializer,
 )
 from django.core.mail import send_mail
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
@@ -17,9 +17,11 @@ from django.utils.encoding import force_bytes, force_str
 from django.contrib.auth.tokens import default_token_generator
 from django.urls import reverse
 from django.conf import settings
+from rest_framework_simplejwt.tokens import RefreshToken
 
 
-# ✅ Register View (Restored)
+
+# Register View 
 class RegisterView(APIView):
     permission_classes = [AllowAny]
 
@@ -42,7 +44,7 @@ class RegisterView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-# ✅ Verify Email View (Restored)
+#  Verify Email View 
 class VerifyEmailView(APIView):
     permission_classes = [AllowAny]
 
@@ -59,57 +61,20 @@ class VerifyEmailView(APIView):
             return Response({"error": "Invalid token"}, status=status.HTTP_400_BAD_REQUEST)
 
 
-# ✅ Login View (Restored)
 
-
-# class LoginView(APIView):
-#     permission_classes = [AllowAny]
-
-#     def post(self, request):
-#         print("Incoming login data:", request.data)  # ✅ Debugging log
-#         serializer = UserLoginSerializer(data=request.data)
-#         if serializer.is_valid():
-#             user = serializer.validated_data['user']
-#             if user.is_verified:
-#                 # ✅ Generate JWT tokens using RefreshToken class
-#                 refresh_token = RefreshToken.for_user(user)
-#                 access_token = str(refresh_token.access_token)
-
-#                 return Response({
-#                     "access_token": access_token,
-#                     "refresh_token": str(refresh_token),
-#                     "user": {
-#                         "id": user.id,
-#                         "username": user.username,
-#                         "email": user.email,
-#                         "profile_picture": user.profile_picture.url if user.profile_picture else None
-#                     }
-#                 }, status=status.HTTP_200_OK)
-#             return Response({"error": "Please verify your email first."}, status=status.HTTP_400_BAD_REQUEST)
-#         else:
-#             print("Login serializer errors:", serializer.errors)  # ✅ Debugging log
-#             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-from rest_framework.permissions import AllowAny
-from rest_framework_simplejwt.tokens import RefreshToken
-from django.contrib.auth import authenticate
-from rest_framework.response import Response
-from rest_framework import status
-from rest_framework.views import APIView
-from .serializers import UserLoginSerializer, UserProfileSerializer
+#login view
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
-
 @method_decorator(csrf_exempt, name="dispatch")
 class LoginView(APIView):
-    permission_classes = [AllowAny]  # ✅ Allow login without authentication
+    permission_classes = [AllowAny]  # Allow login without authentication
     
     def post(self, request):
         serializer = UserLoginSerializer(data=request.data)
         if serializer.is_valid():
             user = serializer.validated_data["user"]
 
-            # ✅ Generate tokens using SimpleJWT
+            # Generate tokens using SimpleJWT
             refresh = RefreshToken.for_user(user)
             access_token = str(refresh.access_token)
             refresh_token = str(refresh)
@@ -127,42 +92,9 @@ class LoginView(APIView):
         return Response(serializer.errors, status=status.HTTP_401_UNAUTHORIZED)
 
 
-
-
-
-# class LoginView(APIView):
-#     permission_classes = [AllowAny]
-
-#     def post(self, request):
-#         serializer = UserLoginSerializer(data=request.data)
-#         if serializer.is_valid():
-#             user = serializer.validated_data['user']
-#             if user.is_verified:
-#                 refresh_token = RefreshToken.for_user(user)
-#                 access_token = str(refresh_token.access_token)
-
-#                 return Response({
-#                     "access_token": access_token,
-#                     "refresh_token": str(refresh_token),
-#                     "user": {
-#                         "id": user.id,
-#                         "username": user.username,
-#                         "email": user.email,
-#                         "profile_picture": user.profile_picture.url if user.profile_picture else None
-#                     }
-#                 }, status=status.HTTP_200_OK)
-#             else:
-#                 # ✅ Return error and a flag to allow resending verification
-#                 return Response(
-#                     {"error": "Please verify your email first.", "user_inactive": True},
-#                     status=status.HTTP_400_BAD_REQUEST
-#                 )
-#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-# ✅ Resend Verification Email View
+# Resend verification link
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
-
 @method_decorator(csrf_exempt, name='dispatch')
 class ResendVerificationEmailView(APIView):
     permission_classes = [AllowAny]
@@ -186,6 +118,7 @@ class ResendVerificationEmailView(APIView):
             return Response({"error": "Email is already verified."}, status=status.HTTP_400_BAD_REQUEST)
         except User.DoesNotExist:
             return Response({"error": "No user found with this email."}, status=status.HTTP_400_BAD_REQUEST)
+  
         
 class GetEmailView(APIView):
     permission_classes = [AllowAny]
@@ -205,116 +138,10 @@ class GetEmailView(APIView):
             return Response({"email": user.email}, status=status.HTTP_200_OK)
         return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
 
-# ✅ Logout View (Restored)
-class LogoutView(APIView):
-    permission_classes = [IsAuthenticated]
-
-    def post(self, request):
-        logout(request)
-        return Response({"message": "Successfully logged out"}, status=status.HTTP_200_OK)
-
-
-# ✅ User Profile View (Restored)
-# class UserProfileView(APIView):
-#     permission_classes = [IsAuthenticated]
-
-#     def get(self, request):
-#         serializer = UserProfileSerializer(request.user, context={"request": request})
-#         return Response(serializer.data, status=status.HTTP_200_OK)
-
-#     def patch(self, request):
-#         serializer = UserProfileSerializer(request.user, data=request.data, partial=True, context={"request": request})
-#         if serializer.is_valid():
-#             serializer.save()
-#             return Response(serializer.data, status=status.HTTP_200_OK)
-#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-from rest_framework import status
-from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.views import APIView
-from .serializers import UserProfileSerializer
-
-class UserProfileView(APIView):
-    permission_classes = [IsAuthenticated]
-
-    def get(self, request):
-        serializer = UserProfileSerializer(request.user)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-    def put(self, request):
-        serializer = UserProfileSerializer(request.user, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def patch(self, request):
-        serializer = UserProfileSerializer(request.user, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 
-# ✅ Create Blog View (Restored)
-# class CreateBlogView(generics.CreateAPIView):
-#     serializer_class = BlogPostSerializer
-#     permission_classes = [IsAuthenticated]
-
-#     def perform_create(self, serializer):
-#         serializer.save(author=self.request.user)
-from rest_framework import generics, permissions
-from .models import BlogPost
-from .serializers import BlogPostSerializer
-
-class CreateBlogView(generics.ListCreateAPIView):
-    permission_classes = [permissions.IsAuthenticated]
-    serializer_class = BlogPostSerializer
-
-    def get_queryset(self):
-        return BlogPost.objects.all()
-
-    def perform_create(self, serializer):
-        serializer.save(author=self.request.user)
-class BlogView(generics.ListCreateAPIView):
-    # permission_classes = [permissions.IsAuthenticated]
-    serializer_class = BlogPostSerializer
-
-    def get_queryset(self):
-        return BlogPost.objects.all()
-
-    def perform_create(self, serializer):
-        serializer.save(author=self.request.user)
-
-# ✅ Blog Detail View (Restored)
-class BlogDetailView(generics.RetrieveAPIView):
-    queryset = BlogPost.objects.all()
-    serializer_class = BlogDetailSerializer
-    permission_classes = [permissions.AllowAny]
-
-
-# ✅ Blog Delete View (Restored)
-class BlogDeleteView(generics.DestroyAPIView):
-    queryset = BlogPost.objects.all()
-    permission_classes = [IsAuthenticated]
-
-    def perform_destroy(self, instance):
-        if instance.author != self.request.user:
-            raise PermissionError("You don't have permission to delete this blog.")
-        instance.delete()
-
-
-# ✅ Your Blogs View (Restored)
-class YourBlogsView(generics.ListAPIView):
-    serializer_class = BlogPostSerializer
-    permission_classes = [IsAuthenticated]
-
-    def get_queryset(self):
-        return BlogPost.objects.filter(author=self.request.user)
-
-
-# ✅ Password Reset Request View (Restored)
+# Password Reset Request View
 class PasswordResetRequestView(APIView):
     permission_classes = [AllowAny]
 
@@ -336,7 +163,7 @@ class PasswordResetRequestView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-# ✅ Password Reset Confirm View (Restored)
+# Password Reset Confirm View 
 class PasswordResetConfirmView(APIView):
     permission_classes = [AllowAny]
 
@@ -356,14 +183,116 @@ class PasswordResetConfirmView(APIView):
             return Response({"error": "Invalid token"}, status=status.HTTP_400_BAD_REQUEST)
 
 
-from rest_framework import generics, permissions, status
-from rest_framework.response import Response
-from rest_framework.views import APIView
-from django.shortcuts import get_object_or_404
-from .models import BlogPost, Comment
-from .serializers import CommentSerializer
+# Access profile 
+class UserProfileView(APIView):
+    permission_classes = [IsAuthenticated]
 
-# ✅ List Comments View (GET)
+    def get(self, request):
+        serializer = UserProfileSerializer(request.user)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def put(self, request):
+        serializer = UserProfileSerializer(request.user, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def patch(self, request):
+        serializer = UserProfileSerializer(request.user, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+#  Logout View
+class LogoutView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        logout(request)
+        return Response({"message": "Successfully logged out"}, status=status.HTTP_200_OK)
+
+
+#  Custom Pagination Class
+from rest_framework import pagination
+class BlogPagination(pagination.PageNumberPagination):
+    page_size = 3  # ✅ Number of blogs per page
+    page_size_query_param = 'page_size'
+    max_page_size = 100
+
+
+#  Create Blog 
+class CreateBlogView(generics.ListCreateAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = BlogPostSerializer
+
+    def get_queryset(self):
+        return BlogPost.objects.all()
+
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user)
+
+
+#fetch blog on dashboard without login
+class BlogView(generics.ListCreateAPIView):
+    # permission_classes = [permissions.IsAuthenticated]
+    serializer_class = BlogPostSerializer
+
+    def get_queryset(self):
+        return BlogPost.objects.all()
+
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user)
+
+#fetch blog on dashboard and yourblog after login
+class BlogListView(generics.ListCreateAPIView):
+    queryset = BlogPost.objects.all().order_by('-created_at')
+    serializer_class = BlogPostSerializer
+    pagination_class = BlogPagination
+    
+    def get_permissions(self):
+        if self.request.method == 'GET':
+            return [permissions.IsAuthenticated()]  # Require login for POST requests
+
+
+# Blog Detail only Authenticate user can access that
+class BlogDetailView(APIView):
+    permission_classes = [AllowAny]  
+
+    def get(self, request, pk):
+        try:
+            blog = BlogPost.objects.get(pk=pk)
+            serializer = BlogDetailSerializer(blog, context={'request': request})
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except BlogPost.DoesNotExist:
+            return Response({"detail": "Blog not found"}, status=status.HTTP_404_NOT_FOUND)
+        
+
+        
+
+# Blog Delete Authenticate user can do that
+class BlogDeleteView(generics.DestroyAPIView):
+    queryset = BlogPost.objects.all()
+    permission_classes = [IsAuthenticated]
+
+    def perform_destroy(self, instance):
+        if instance.author != self.request.user:
+            raise PermissionError("You don't have permission to delete this blog.")
+        instance.delete()
+
+
+#  Your Blogs View only Authenticate user can access that
+class YourBlogsView(generics.ListAPIView):
+    serializer_class = BlogPostSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return BlogPost.objects.filter(author=self.request.user)
+
+
+from .serializers import CommentSerializer
+# List Comments (GET)
 class ListCommentsView(generics.ListAPIView):
     serializer_class = CommentSerializer
     permission_classes = [permissions.AllowAny]
@@ -372,15 +301,8 @@ class ListCommentsView(generics.ListAPIView):
         blog_id = self.kwargs['blog_id']
         return Comment.objects.filter(blog_id=blog_id).order_by('-created_at')
 
-# ✅ Create Comment View (POST)
-from rest_framework import generics, permissions
-from rest_framework.response import Response
-from rest_framework import status
-from .models import BlogPost, Comment
-from .serializers import CommentSerializer
-from django.shortcuts import get_object_or_404
-
-# ✅ Handle POST for creating a comment
+# Create Comment(POST)
+#  Handle POST for creating a comment
 class CreateCommentView(generics.CreateAPIView):
     serializer_class = CommentSerializer
     permission_classes = [permissions.IsAuthenticated]
@@ -393,13 +315,7 @@ class CreateCommentView(generics.CreateAPIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
-
-from rest_framework import generics, permissions, status
-from rest_framework.response import Response
-from django.shortcuts import get_object_or_404
-from .models import Comment
-
+# Delete comment
 class DeleteCommentView(generics.DestroyAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
@@ -410,53 +326,36 @@ class DeleteCommentView(generics.DestroyAPIView):
 
 
 
-from rest_framework import generics, permissions, pagination
+
+
+
+from rest_framework import generics, permissions
+from rest_framework.response import Response
+from rest_framework import status
 from .models import BlogPost
 from .serializers import BlogPostSerializer
 
-# ✅ Custom Pagination Class
-class BlogPagination(pagination.PageNumberPagination):
-    page_size = 3  # ✅ Number of blogs per page
-    page_size_query_param = 'page_size'
-    max_page_size = 10
-
-from rest_framework.permissions import AllowAny
-from rest_framework import generics
-from .models import BlogPost
-from .serializers import BlogPostSerializer
-
-from rest_framework import permissions, generics
-from .models import BlogPost
-from .serializers import BlogPostSerializer
-
-
-class BlogListView(generics.ListCreateAPIView):
-    queryset = BlogPost.objects.all().order_by('-created_at')
+class BlogUpdateView(generics.UpdateAPIView):
+    queryset = BlogPost.objects.all()
     serializer_class = BlogPostSerializer
-    pagination_class = BlogPagination
-    
-    # ✅ Allow GET for everyone, require login for POST
-    def get_permissions(self):
-        if self.request.method == 'GET':
-            return [permissions.AllowAny()]  # ✅ Public access for GET
-        return [permissions.IsAuthenticated()]  # ✅ Require login for POST
+    permission_classes = [permissions.IsAuthenticated]
 
-# class BlogListView(generics.ListCreateAPIView):
-#     queryset = BlogPost.objects.all().order_by('-created_at')
+    def get_queryset(self):
+        return BlogPost.objects.filter(author=self.request.user)
+
+
+# class BlogUpdateView(generics.UpdateAPIView):
+#     queryset = BlogPost.objects.all()
 #     serializer_class = BlogPostSerializer
-#     pagination_class = BlogPagination
-#     permission_classes = [AllowAny] 
-    
-#     def get_permissions(self):
-#         if self.request.method == 'GET':
-#             return [permissions.AllowAny()]  # ✅ Allow unauthenticated GET requests
-#         return [permissions.IsAuthenticated()]
-    
-#     from rest_framework.permissions import IsAuthenticated
+#     permission_classes = [permissions.IsAuthenticated]
 
+#     def get_queryset(self):
+#         # Allow update only for the author of the blog
+#         return BlogPost.objects.filter(author=self.request.user)
 
-#     def get_permissions(self):
-#         if self.request.method == 'POST':
-#             return [IsAuthenticated()]  # ✅ Require login for POST
-#         return [AllowAny()]  # ✅ Allow public GET
+#     def patch(self, request, *args, **kwargs):
+#         return self.update(request, *args, **kwargs)
+
+#     def put(self, request, *args, **kwargs):
+#         return self.update(request, *args, **kwargs)
 

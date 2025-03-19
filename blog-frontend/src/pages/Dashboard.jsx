@@ -13,19 +13,18 @@ const Dashboard = () => {
   const navigate = useNavigate();
 
 
-  // ✅ Fetch Blogs
+  //  Fetch Blogs
   const fetchBlogs = async () => {
     try {
       const token = localStorage.getItem("accessToken");
-  
-      // ✅ Only include Authorization header if token is available
+    
       const headers = {
         "Content-Type": "application/json",
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
       };
   
       console.log("Fetching blogs with headers:", headers);
-  
+    
       const response = await fetch("http://127.0.0.1:8000/api/getblogs/", {
         method: "GET",
         headers,
@@ -43,72 +42,27 @@ const Dashboard = () => {
     }
   };
   
-  
-  
-// const fetchBlogs = async () => {
-//   try {
-//     const token = localStorage.getItem("accessToken");
-
-//     const headers = {
-//       "Content-Type": "application/json",
-//       ...(token ? { Authorization: `Bearer ${token}` } : {}), // ✅ Conditionally add token
-//     };
-
-//     const response = await fetch("http://127.0.0.1:8000/api/blogs/", {
-//       method: "GET",
-//       headers,
-//     });
-
-//     if (!response.ok) {
-//       if (response.status === 401 && token) {
-//         console.log("Access token expired. Attempting to refresh...");
-//         const refreshed = await refreshAccessToken();
-//         if (refreshed) {
-//           await fetchBlogs(); // ✅ Retry fetching after token refresh
-//         } else {
-//           throw new Error("Session expired. Please log in again.");
-//         }
-//       } else {
-//         throw new Error("Failed to fetch blogs");
-//       }
-//     }
-
-//     const data = await response.json();
-//     setBlogs(data);
-//   } catch (err) {
-//     console.error("Error fetching blogs:", err);
-//     setError(err.message || "Failed to load blogs");
-//   }
-// };
-
   // const fetchBlogs = async () => {
   //   try {
   //     const token = localStorage.getItem("accessToken");
-
+  
+  //     // ✅ Only include Authorization header if token is available
   //     const headers = {
   //       "Content-Type": "application/json",
   //       ...(token ? { Authorization: `Bearer ${token}` } : {}),
   //     };
-
-  //     const response = await fetch("http://127.0.0.1:8000/api/blogs/", {
+  
+  //     console.log("Fetching blogs with headers:", headers);
+  
+  //     const response = await fetch("http://127.0.0.1:8000/api/getblogs/", {
   //       method: "GET",
   //       headers,
   //     });
-
+  
   //     if (!response.ok) {
-  //       if (response.status === 401 && token) {
-  //         console.log("Access token expired. Attempting to refresh...");
-  //         const refreshed = await refreshAccessToken();
-  //         if (refreshed) {
-  //           await fetchBlogs();
-  //         } else {
-  //           throw new Error("Session expired. Please log in again.");
-  //         }
-  //       } else {
-  //         throw new Error("Failed to fetch blogs");
-  //       }
+  //       throw new Error("Failed to fetch blogs");
   //     }
-
+  
   //     const data = await response.json();
   //     setBlogs(data);
   //   } catch (err) {
@@ -116,8 +70,10 @@ const Dashboard = () => {
   //     setError(err.message || "Failed to load blogs");
   //   }
   // };
+  
 
-  // ✅ Refresh Access Token
+
+  // Refresh Access Token
   const refreshAccessToken = async () => {
     try {
       const refreshToken = localStorage.getItem("refreshToken");
@@ -144,34 +100,8 @@ const Dashboard = () => {
     }
   };
   
-  
-  // const refreshAccessToken = async () => {
-  //   try {
-  //     const refreshToken = localStorage.getItem("refreshToken");
-  //     if (!refreshToken) return null;
 
-  //     const response = await fetch("http://127.0.0.1:8000/api/auth/token/refresh/", {
-  //       method: "POST",
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //       },
-  //       body: JSON.stringify({ refresh: refreshToken }),
-  //     });
-
-  //     if (!response.ok) throw new Error("Failed to refresh token");
-
-  //     const data = await response.json();
-  //     localStorage.setItem("accessToken", data.access);
-  //     console.log("Token refreshed successfully");
-  //     return data.access;
-  //   } catch (err) {
-  //     console.error("Failed to refresh token:", err);
-  //     handleLogout(); 
-  //     return null;
-  //   }
-  // };
-
-  // ✅ Handle Logout
+  // Handle Logout
   const handleLogout = () => {
     localStorage.removeItem("accessToken");
     localStorage.removeItem("refreshToken");
@@ -182,7 +112,7 @@ const Dashboard = () => {
   };
   
 
-  // ✅ Delete Blog
+  //  Delete Blog
   const handleDelete = async (id) => {
     if (window.confirm("Are you sure you want to delete this blog?")) {
       try {
@@ -206,38 +136,38 @@ const Dashboard = () => {
     }
   };
 
-  // ✅ Pagination Variables
+  //  Pagination Variables
   const totalBlogs = blogs?.length || 0;
   const totalPages = Math.ceil(totalBlogs / blogsPerPage) || 1;
   const startIndex = (currentPage - 1) * blogsPerPage;
   const endIndex = startIndex + blogsPerPage;
   const currentBlogs = blogs?.slice(startIndex, endIndex) || [];
 
-  // ✅ Handle Page Change
+  // Handle Page Change
   const handlePageChange = (pageNumber) => {
     if (pageNumber >= 1 && pageNumber <= totalPages) {
       setCurrentPage(pageNumber);
     }
   };
 
-  // ✅ Filter Blogs by Search Query
+  //  Filter Blogs by Search Query
   const filteredBlogs = currentBlogs.filter((blog) =>
     blog.title.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  // ✅ Fetch Blogs on Component Mount
+  // Fetch Blogs on Component Mount
   useEffect(() => {
     fetchBlogs();
   }, []);
 
   return (
     <div className="max-w-7xl mx-auto mt-10 p-6 bg-gray-50 shadow-lg rounded-xl">
-      {/* ✅ Heading */}
+      {/*  Heading */}
       <h2 className="text-3xl font-extrabold text-gray-800 mb-6 text-center">
         📚 All Blogs
       </h2>
 
-      {/* ✅ Search Bar */}
+      {/*  Search Bar */}
       <input
         type="text"
         placeholder="Search blogs..."
@@ -246,14 +176,14 @@ const Dashboard = () => {
         className="w-full border rounded-lg px-4 py-2 mb-4"
       />
 
-      {/* ✅ Error Message */}
+      {/*  Error Message */}
       {error && (
         <p className="text-red-500 text-center mb-4 bg-red-100 p-2 rounded-lg">
           {error}
         </p>
       )}
 
-      {/* ✅ Blog List */}
+      {/*  Blog List */}
       {filteredBlogs.length === 0 ? (
         <p className="text-center text-gray-500">No blogs found.</p>
       ) : (
@@ -274,7 +204,7 @@ const Dashboard = () => {
                 </div>
               )}
 
-              {/* ✅ Hover Overlay */}
+              {/* Hover Overlay */}
               <div className="absolute inset-0 bg-white bg-opacity-40 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition duration-300 flex items-center justify-center space-x-4">
                 <FiEye
                   className="text-gray-700 text-3xl cursor-pointer hover:text-blue-500 transition transform hover:scale-110"
@@ -290,7 +220,7 @@ const Dashboard = () => {
                 />
               </div>
 
-              {/* ✅ Blog Content */}
+              {/*  Blog Content */}
               <div className="p-4">
                 <h3 className="text-xl font-semibold text-gray-800">{blog.title}</h3>
                 <p className="text-gray-600 mt-2 line-clamp-3">{blog.content}</p>
@@ -304,7 +234,7 @@ const Dashboard = () => {
         </div>
       )}
 
-      {/* ✅ Pagination */}
+      {/*  Pagination */}
       <div className="flex justify-center mt-6 space-x-2">
         {[...Array(totalPages)].map((_, i) => (
           <button

@@ -11,12 +11,12 @@ const Login = ({ setUser }) => {
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
-  // ✅ Handle form input changes
+  //  Handle form input changes
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // ✅ Handle form submission
+  //  Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
@@ -34,7 +34,7 @@ const Login = ({ setUser }) => {
       const data = await response.json();
 
       if (response.ok) {
-        // ✅ Store tokens and user data
+        // Store tokens and user data
         localStorage.setItem("accessToken", data?.access_token);
         localStorage.setItem("refreshToken", data?.refresh_token);
         localStorage.setItem("user", JSON.stringify(data?.user));
@@ -44,10 +44,10 @@ const Login = ({ setUser }) => {
           localStorage.setItem("profile_picture", data.user.profile_picture);
         }
 
-        setUser(data.user); // ✅ Update user state
+        setUser(data.user); //  Update user state
         
-        // ✅ Show success toast
-        toast.success("✅ Login successful!");
+        // Show success toast
+        toast.success(" Login successful!");
 
         navigate("/");
       } else {
@@ -67,14 +67,14 @@ const Login = ({ setUser }) => {
     }
   };
 
-  // ✅ Resend verification link
+  //  Resend verification link
   const [loading, setLoading] = useState(false);
 
 const resendVerificationLink = async () => {
-  if (loading) return; // ✅ Prevent multiple clicks
+  if (loading) return; //  Prevent multiple clicks
   setLoading(true);
 
-  const toastId = toast.loading("⏳ Sending verification link..."); // ✅ Show loading toast
+  const toastId = toast.loading("⏳ Sending verification link..."); //  Show loading toast
 
   try {
     let email = formData.login_field;
@@ -108,11 +108,11 @@ const resendVerificationLink = async () => {
 
     if (response.ok) {
       toast.update(toastId, {
-        render: "✅ Verification link sent. Please check your email.",
+        render: " Verification link sent. Please check your email.",
         type: "success",
         isLoading: false,
         autoClose: 3000,
-        icon: false, // ✅ Remove duplicate icon
+        icon: false, // Remove duplicate icon
       });
       setShowResendLink(false);
     } else {
@@ -138,48 +138,6 @@ const resendVerificationLink = async () => {
   }
 };
 
-  // const resendVerificationLink = async () => {
-  //   try {
-  //     let email = formData.login_field;
-
-  //     if (!email.includes("@")) {
-  //       const response = await fetch(`http://127.0.0.1:8000/api/auth/get-email/`, {
-  //         method: "POST",
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //         },
-  //         body: JSON.stringify({ login_field: formData.login_field }),
-  //       });
-
-  //       const data = await response.json();
-  //       if (response.ok) {
-  //         email = data.email;
-  //       } else {
-  //         throw new Error(data.error || "Failed to retrieve email.");
-  //       }
-  //     }
-
-  //     const response = await fetch("http://127.0.0.1:8000/api/auth/resend-verification-email/", {
-  //       method: "POST",
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //       },
-  //       body: JSON.stringify({ email }),
-  //     });
-
-  //     const data = await response.json();
-  //     if (response.ok) {
-  //       toast.success("✅ Verification link sent. Please check your email.");
-  //       setShowResendLink(false);
-  //     } else {
-  //       setError(data.error || "Failed to send verification link.");
-  //     }
-  //   } catch (error) {
-  //     console.error("Resend verification link error:", error);
-  //     setError("Something went wrong. Please try again.");
-  //   }
-  // };
-
   return (
     <div className="flex justify-center items-center h-screen bg-gray-100">
       <div className="bg-white p-6 rounded-lg shadow-lg w-96">
@@ -188,7 +146,7 @@ const resendVerificationLink = async () => {
         {error && <p className="text-red-500 text-center mt-2">{error}</p>}
 
         <form className="mt-4" onSubmit={handleSubmit}>
-          {/* ✅ Login Field */}
+          {/* Login Field */}
           <input
             type="text"
             name="login_field"
@@ -199,7 +157,7 @@ const resendVerificationLink = async () => {
             required
           />
 
-          {/* ✅ Password Field with Show/Hide Icon */}
+          {/* Password Field with Show/Hide Icon */}
           <div className="relative mt-2">
             <input
               type={showPassword ? "text" : "password"}
@@ -210,7 +168,7 @@ const resendVerificationLink = async () => {
               onChange={handleChange}
               required
             />
-            {/* ✅ Eye Icon */}
+            {/*  Eye Icon */}
             <span
               className="absolute right-3 top-3 cursor-pointer text-gray-400"
               onClick={() => setShowPassword(!showPassword)}
@@ -227,7 +185,7 @@ const resendVerificationLink = async () => {
           </button>
         </form>
 
-        {/* ✅ Resend Verification Link */}
+        {/*  Resend Verification Link */}
         {showResendLink && (
           <div className="mt-4 text-center">
             <p className="text-sm text-gray-600">
@@ -242,7 +200,7 @@ const resendVerificationLink = async () => {
           </div>
         )}
 
-        {/* ✅ Forgot Password Link */}
+        {/* Forgot Password Link */}
         <div className="mt-4 text-center">
           <Link to="/forgot-password" className="text-blue-600 hover:underline">
             Forgot Password?

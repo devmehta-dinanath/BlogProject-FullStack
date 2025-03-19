@@ -11,32 +11,32 @@ const BlogDetail = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
 
-  // ✅ Fetch Blog Function
+  //  Fetch Blog Function
   const fetchBlog = async () => {
-    setLoading(true);
+    setLoading(true); // ✅ Start loading
+  
     try {
-      const token = localStorage.getItem("accessToken");
-      if (!token) throw new Error("Unauthorized. Please log in.");
-
       const response = await fetch(`http://127.0.0.1:8000/api/blogs/${id}/`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
         },
       });
-
-      if (!response.ok) throw new Error("Failed to fetch blog");
-
+  
+      if (!response.ok) {
+        throw new Error("Failed to fetch blog");
+      }
+  
       const data = await response.json();
       setBlog(data);
-    } catch (err) {
-      console.error("Error fetching blog:", err);
-      setError(err.message || "Failed to load blog");
+    } catch (error) {
+      console.error("Error fetching blog:", error);
+      setError("Failed to load blog");
     } finally {
-      setLoading(false);
+      setLoading(false); // ✅ Stop loading after fetch attempt
     }
   };
+  
 
   // ✅ Fetch Comments Function
   const fetchComments = async () => {
@@ -62,7 +62,7 @@ const BlogDetail = () => {
     }
   };
 
-//   // ✅ Post New Comment Function
+// Post New Comment Function
 const handlePostComment = async () => {
   if (!newComment.trim()) return;
 
@@ -91,61 +91,9 @@ const handlePostComment = async () => {
   }
 };
 
-// const handlePostComment = async () => {
-//     if (!newComment.trim()) return;
-  
-//     try {
-//       const token = localStorage.getItem("accessToken");
-//       if (!token) throw new Error("Unauthorized. Please log in.");
-  
-//       const response = await fetch(`http://127.0.0.1:8000/api/blogs/${id}/comments/`, { // ✅ Removed `/create/`
-//         method: "POST",
-//         headers: {
-//           "Content-Type": "application/json",
-//           Authorization: `Bearer ${token}`,
-//         },
-//         body: JSON.stringify({ content: newComment }),
-//       });
-  
-//       if (!response.ok) throw new Error("Failed to post comment");
-  
-//       const newCommentData = await response.json();
-//       setComments([...comments, newCommentData]);
-//       setNewComment('');
-//     } catch (err) {
-//       console.error("Error posting comment:", err);
-//       setError(err.message || "Failed to post comment");
-//     }
-//   };
-  
-//   const handlePostComment = async () => {
-//     if (!newComment.trim()) return;
 
-//     try {
-//       const token = localStorage.getItem("accessToken");
-//       if (!token) throw new Error("Unauthorized. Please log in.");
 
-//       const response = await fetch(`http://127.0.0.1:8000/api/blogs/${id}/comments/create/`, {
-//         method: "POST",
-//         headers: {
-//           "Content-Type": "application/json",
-//           Authorization: `Bearer ${token}`,
-//         },
-//         body: JSON.stringify({ content: newComment }),
-//       });
-
-//       if (!response.ok) throw new Error("Failed to post comment");
-
-//       const newCommentData = await response.json();
-//       setComments((prevComments) => [...prevComments, newCommentData]); // ✅ Add to state immediately
-//       setNewComment('');
-//     } catch (err) {
-//       console.error("Error posting comment:", err);
-//       setError(err.message || "Failed to post comment");
-//     }
-//   };
-
-  // ✅ Delete Comment Function
+  // Delete Comment Function
   const handleDeleteComment = async (commentId) => {
     if (!window.confirm("Are you sure you want to delete this comment?")) return;
 
@@ -172,7 +120,7 @@ const handlePostComment = async () => {
     }
   };
 
-  // ✅ Logout Function
+  // Logout Function
   const handleLogout = () => {
     localStorage.clear();
     navigate("/login");
@@ -180,15 +128,15 @@ const handlePostComment = async () => {
 
   useEffect(() => {
     fetchBlog();
-    fetchComments(); // ✅ Fetch comments when the page loads
+    fetchComments(); // Fetch comments when the page loads
   }, [id]);
 
-  // ✅ Display Loading State
+  // Display Loading State
   if (loading) {
     return <p className="text-center text-gray-500 mt-6">Loading blog details...</p>;
   }
 
-  // ✅ Display Error Message
+  //  Display Error Message
   if (error) {
     return (
       <div className="text-red-500 text-center mt-6">
@@ -205,10 +153,10 @@ const handlePostComment = async () => {
 
   return (
     <div className="max-w-3xl mx-auto mt-10 p-6 bg-white shadow-lg rounded-xl border border-gray-200">
-      {/* ✅ Blog Title */}
+      {/* Blog Title */}
       <h2 className="text-3xl font-extrabold text-gray-800 mb-4">{blog.title}</h2>
 
-      {/* ✅ Blog Image */}
+      {/* Blog Image */}
       {blog.image && (
         <img
           src={blog.image}
@@ -217,10 +165,10 @@ const handlePostComment = async () => {
         />
       )}
 
-      {/* ✅ Blog Content */}
+      {/* Blog Content */}
       <p className="text-gray-600 mb-6 leading-relaxed">{blog.content}</p>
 
-      {/* ✅ Blog Metadata */}
+      {/* Blog Metadata */}
       <div className="flex justify-between items-center text-sm text-gray-500 mt-4 border-t pt-4">
         <span>✍️ {blog.author}</span>
         <span>
@@ -234,11 +182,11 @@ const handlePostComment = async () => {
         </span>
       </div>
 
-      {/* ✅ Comment Section */}
+      {/* Comment Section */}
       <div className="mt-8">
         <h3 className="text-xl font-semibold text-gray-800 mb-4">Comments</h3>
 
-        {/* ✅ Render Existing Comments */}
+        {/*  Render Existing Comments */}
         {comments.map((comment) => (
           <div key={comment.id} className="bg-gray-100 p-3 rounded-lg mb-2">
             <p className="text-gray-700">{comment.content}</p>
@@ -254,7 +202,7 @@ const handlePostComment = async () => {
           </div>
         ))}
 
-        {/* ✅ Comment Input */}
+        {/*  Comment Input */}
         <div className="flex mt-4">
           <input
             type="text"
@@ -272,12 +220,12 @@ const handlePostComment = async () => {
         </div>
       </div>
 
-      {/* ✅ Go Back Button */}
+      {/* Go Back Button */}
       <button
         onClick={() => navigate("/dashboard")}
         className="mt-6 px-6 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700"
       >
-        Back to Dashboard
+        Back to Blogs
       </button>
     </div>
   );

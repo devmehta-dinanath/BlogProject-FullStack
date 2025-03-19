@@ -14,7 +14,7 @@ const ResetPassword = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  // ✅ Handle Form Submit
+  // Handle Form Submit
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -50,7 +50,7 @@ const ResetPassword = () => {
 
       if (response.status === 200) {
         toast.update(toastId, {
-          render: "✅ Password reset successful! Redirecting to login...",
+          render: " Password reset successful! Redirecting to login...",
           type: "success",
           isLoading: false,
           autoClose: 3000,
@@ -109,7 +109,7 @@ const ResetPassword = () => {
           </span>
         </div>
 
-        {/* ✅ Confirm Password Field */}
+        {/*  Confirm Password Field */}
         <div className="relative mt-4">
           <input
             type={showConfirmPassword ? "text" : "password"}
@@ -127,7 +127,7 @@ const ResetPassword = () => {
           </span>
         </div>
 
-        {/* ✅ Submit Button */}
+        {/*  Submit Button */}
         <button
           type="submit"
           className={`w-full text-white py-2 mt-4 rounded-lg ${

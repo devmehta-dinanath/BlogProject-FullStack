@@ -7,7 +7,7 @@ const ForgotPassword = () => {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // ✅ Handle form submission
+  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -16,7 +16,7 @@ const ForgotPassword = () => {
       return;
     }
 
-    if (loading) return; // ✅ Prevent double submission
+    if (loading) return; // Prevent double submission
     setLoading(true);
 
     const toastId = toast.loading("⏳ Sending password reset link...");
@@ -34,13 +34,13 @@ const ForgotPassword = () => {
 
       if (response.status === 200) {
         toast.update(toastId, {
-          render: "✅ Password reset link has been sent to your email.",
+          render: " Password reset link has been sent to your email.",
           type: "success",
           isLoading: false,
           autoClose: 3000,
-          icon: false, // ✅ Remove duplicate icon
+          icon: false, // Remove duplicate icon
         });
-        setEmail(""); // ✅ Reset input field
+        setEmail(""); // Reset input field
       } else {
         toast.update(toastId, {
           render: data.error || "❌ Invalid email address.",
@@ -74,7 +74,7 @@ const ForgotPassword = () => {
           Forgot Password
         </h2>
         
-        {/* ✅ Email Input */}
+        {/*  Email Input */}
         <input
           type="email"
           value={email}
@@ -84,7 +84,7 @@ const ForgotPassword = () => {
           required
         />
 
-        {/* ✅ Submit Button */}
+        {/*  Submit Button */}
         <button
           type="submit"
           className={`w-full text-white py-2 mt-4 rounded-lg ${

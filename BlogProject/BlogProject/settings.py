@@ -208,13 +208,13 @@ SIMPLE_JWT = {
     'AUTH_HEADER_TYPES': ('Bearer',),                # Authorization header prefix
 }
 AUTHENTICATION_BACKENDS = [
-    'Blog_app.authentication.CustomAuthBackend',  # ✅ Custom backend
+    'Blog_app.authentication.CustomAuthBackend',  #  Custom backend
     'django.contrib.auth.backends.ModelBackend',
 ]
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.AllowAny',  # ✅ Allow public access unless overridden
+        'rest_framework.permissions.AllowAny',  # Allow public access unless overridden
     ],
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',

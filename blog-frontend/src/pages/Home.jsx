@@ -13,13 +13,13 @@ const Home = ({ user }) => {
   }, []);
 
   const handleGetStarted = () => {
-    console.log("USER STATE IN HOME:", user); // ✅ Debugging user state
+    // console.log("USER STATE IN HOME:", user); // Debugging user state
     if (user?.id) {
-      console.log("✅ Redirecting to CreateBlog");
-      navigate("/dashboard"); // ✅ Redirect if logged in
+      console.log("Redirecting to CreateBlog");
+      navigate("/dashboard"); // Redirect if logged in
     } else {
       console.log("❌ Redirecting to Login");
-      navigate("/login"); // ✅ Redirect to login if logged out
+      navigate("/login"); // Redirect to login if logged out
     }
   };
 
