@@ -42,37 +42,6 @@ const Dashboard = () => {
     }
   };
   
-  // const fetchBlogs = async () => {
-  //   try {
-  //     const token = localStorage.getItem("accessToken");
-  
-  //     // ✅ Only include Authorization header if token is available
-  //     const headers = {
-  //       "Content-Type": "application/json",
-  //       ...(token ? { Authorization: `Bearer ${token}` } : {}),
-  //     };
-  
-  //     console.log("Fetching blogs with headers:", headers);
-  
-  //     const response = await fetch("http://127.0.0.1:8000/api/getblogs/", {
-  //       method: "GET",
-  //       headers,
-  //     });
-  
-  //     if (!response.ok) {
-  //       throw new Error("Failed to fetch blogs");
-  //     }
-  
-  //     const data = await response.json();
-  //     setBlogs(data);
-  //   } catch (err) {
-  //     console.error("Error fetching blogs:", err);
-  //     setError(err.message || "Failed to load blogs");
-  //   }
-  // };
-  
-
-
   // Refresh Access Token
   const refreshAccessToken = async () => {
     try {

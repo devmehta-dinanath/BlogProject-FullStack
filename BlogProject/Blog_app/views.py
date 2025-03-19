@@ -268,7 +268,16 @@ class BlogDetailView(APIView):
         except BlogPost.DoesNotExist:
             return Response({"detail": "Blog not found"}, status=status.HTTP_404_NOT_FOUND)
         
+class DetailView(APIView):
+    # permission_classes = [AllowAny]  
 
+    def get(self, request, pk):
+        try:
+            blog = BlogPost.objects.get(pk=pk)
+            serializer = BlogDetailSerializer(blog, context={'request': request})
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except BlogPost.DoesNotExist:
+            return Response({"detail": "Blog not found"}, status=status.HTTP_404_NOT_FOUND)
         
 
 # Blog Delete Authenticate user can do that
@@ -289,13 +298,32 @@ class YourBlogsView(generics.ListAPIView):
 
     def get_queryset(self):
         return BlogPost.objects.filter(author=self.request.user)
+    
+
+
+#edit Blog
+class BlogUpdateView(generics.UpdateAPIView):
+    queryset = BlogPost.objects.all()
+    serializer_class = BlogPostSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return BlogPost.objects.filter(author=self.request.user)
 
 
 from .serializers import CommentSerializer
 # List Comments (GET)
 class ListCommentsView(generics.ListAPIView):
     serializer_class = CommentSerializer
-    permission_classes = [permissions.AllowAny]
+    # permission_classes = [permissions.AllowAny]
+
+    def get_queryset(self):
+        blog_id = self.kwargs['blog_id']
+        return Comment.objects.filter(blog_id=blog_id).order_by('-created_at')
+    
+class CommentsView(generics.ListAPIView):
+    serializer_class = CommentSerializer
+    # permission_classes = [permissions.AllowAny]
 
     def get_queryset(self):
         blog_id = self.kwargs['blog_id']
@@ -328,34 +356,4 @@ class DeleteCommentView(generics.DestroyAPIView):
 
 
 
-
-from rest_framework import generics, permissions
-from rest_framework.response import Response
-from rest_framework import status
-from .models import BlogPost
-from .serializers import BlogPostSerializer
-
-class BlogUpdateView(generics.UpdateAPIView):
-    queryset = BlogPost.objects.all()
-    serializer_class = BlogPostSerializer
-    permission_classes = [permissions.IsAuthenticated]
-
-    def get_queryset(self):
-        return BlogPost.objects.filter(author=self.request.user)
-
-
-# class BlogUpdateView(generics.UpdateAPIView):
-#     queryset = BlogPost.objects.all()
-#     serializer_class = BlogPostSerializer
-#     permission_classes = [permissions.IsAuthenticated]
-
-#     def get_queryset(self):
-#         # Allow update only for the author of the blog
-#         return BlogPost.objects.filter(author=self.request.user)
-
-#     def patch(self, request, *args, **kwargs):
-#         return self.update(request, *args, **kwargs)
-
-#     def put(self, request, *args, **kwargs):
-#         return self.update(request, *args, **kwargs)
 

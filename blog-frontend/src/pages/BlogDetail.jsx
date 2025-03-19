@@ -39,16 +39,17 @@ const BlogDetail = () => {
   
 
   // ✅ Fetch Comments Function
+  
   const fetchComments = async () => {
     try {
-      const token = localStorage.getItem("accessToken");
-      if (!token) throw new Error("Unauthorized. Please log in.");
+      // const token = localStorage.getItem("accessToken");
+      // if (!token) throw new Error("Unauthorized. Please log in.");
 
       const response = await fetch(`http://127.0.0.1:8000/api/blogs/${id}/comments/`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+          // Authorization: `Bearer ${token}`,
         },
       });
 

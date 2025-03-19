@@ -51,7 +51,7 @@ const EditBlog = () => {
       }
   
       alert("Blog updated successfully");
-      navigate("/your-blogs");
+      navigate("/yourblog");
     } catch (error) {
       console.error("Error:", error);
       setError(error.message);
