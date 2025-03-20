@@ -111,7 +111,7 @@ const CreateBlog = () => {
           />
         </div>
 
-        {/* ✅ Image Upload */}
+        {/* Image Upload */}
         <div className="mb-4">
           <label className="block text-gray-700 font-semibold">Image:</label>
           <input

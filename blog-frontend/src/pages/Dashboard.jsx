@@ -1,6 +1,6 @@
 
 import { useEffect, useState } from 'react';
-import { FiEye, FiEdit, FiTrash, FiMessageCircle } from "react-icons/fi";
+import { FiEye, FiTrash } from "react-icons/fi";
 import { useNavigate } from 'react-router-dom';
 
 const Dashboard = () => {
@@ -64,7 +64,7 @@ const Dashboard = () => {
       return data.access;
     } catch (err) {
       console.error("Failed to refresh token:", err);
-      handleLogout(); // ✅ Logout if refresh fails
+      handleLogout(); //  Logout if refresh fails
       return null;
     }
   };
@@ -162,7 +162,7 @@ const Dashboard = () => {
               key={blog.id}
               className="group bg-white border border-gray-200 rounded-lg overflow-hidden shadow-md hover:shadow-xl hover:scale-[1.02] transition duration-300 ease-in-out relative"
             >
-              {/* ✅ Blog Image */}
+              {/* Blog Image */}
               {blog.image && (
                 <div className="w-full h-52">
                   <img
