@@ -13,7 +13,7 @@ class User(AbstractUser):
     id = models.AutoField(primary_key=True)
     email = models.EmailField(unique=True) 
     phone = models.CharField(validators=[phone_regex], max_length=10, unique=True, null=True,blank=True ) 
-    profile_picture = models.ImageField(upload_to='profile_pictures/', blank=True, null=True)  # ✅ Allow null and blank
+    profile_picture = models.ImageField(upload_to='profile_pictures/', blank=True, null=True)  #  Allow null and blank
     is_verified = models.BooleanField(default=False)  # field  is Required for email verification
 
 
