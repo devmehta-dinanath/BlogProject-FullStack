@@ -183,10 +183,10 @@ const Dashboard = () => {
                   className="text-gray-700 text-3xl cursor-pointer hover:text-green-500 transition transform hover:scale-110"
                   onClick={() => navigate(`/blogs/edit/${blog.id}`)}
                 /> */}
-                <FiTrash
+                {/* <FiTrash
                   className="text-gray-700 text-3xl cursor-pointer hover:text-red-500 transition transform hover:scale-110"
                   onClick={() => handleDelete(blog.id)}
-                />
+                /> */}
               </div>
 
               {/*  Blog Content */}
