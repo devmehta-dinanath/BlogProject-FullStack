@@ -19,12 +19,12 @@ const ResetPassword = () => {
     e.preventDefault();
 
     if (!password || !confirmPassword) {
-      toast.error("❌ All fields are required.");
+      toast.error(" All fields are required.");
       return;
     }
 
     if (password !== confirmPassword) {
-      toast.error("❌ Passwords do not match.");
+      toast.error(" Passwords do not match.");
       return;
     }
 

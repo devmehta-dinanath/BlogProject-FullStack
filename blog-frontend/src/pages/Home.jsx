@@ -33,11 +33,12 @@ const Home = ({ user }) => {
         Share your thoughts and connect with others.
       </p>
       <button 
-        onClick={handleGetStarted}
-        className="mt-4 px-6 py-2 bg-blue-600 text-white rounded-lg shadow-md hover:bg-blue-700 transition duration-300"
-      >
-        Get Started
-      </button>
+  onClick={handleGetStarted}
+  className="mt-4 px-6 py-2 bg-blue-900 text-white rounded-lg shadow-md hover:bg-green-600 transition duration-300"
+>
+  Get Started
+</button>
+
     </div>
   );
 };

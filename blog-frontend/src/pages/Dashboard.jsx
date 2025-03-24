@@ -204,17 +204,19 @@ const Dashboard = () => {
       )}
 
       {/*  Pagination */}
-      <div className="flex justify-center mt-6 space-x-2">
-        {[...Array(totalPages)].map((_, i) => (
-          <button
-            key={i}
-            onClick={() => handlePageChange(i + 1)}
-            className={`px-4 py-2 border rounded ${i + 1 === currentPage ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
-          >
-            {i + 1}
-          </button>
-        ))}
-      </div>
+<div className="flex justify-center mt-6 space-x-2">
+  {[...Array(totalPages)].map((_, i) => (
+    <button
+      key={i}
+      onClick={() => handlePageChange(i + 1)}
+      className={`w-10 h-10 flex items-center justify-center rounded-full border 
+        ${i + 1 === currentPage ? 'bg-blue-900 text-white' : 'bg-gray-300 text-gray-700 hover:bg-blue-700 hover:text-white transition duration-300'}`}
+    >
+      {i + 1}
+    </button>
+  ))}
+</div>
+
     </div>
   );
 };
