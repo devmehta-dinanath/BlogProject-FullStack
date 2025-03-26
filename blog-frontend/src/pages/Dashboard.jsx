@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { FiEye, FiTrash } from "react-icons/fi";
 import { useNavigate } from 'react-router-dom';
@@ -11,8 +10,6 @@ const Dashboard = () => {
   const [blogsPerPage] = useState(3);
 
   const navigate = useNavigate();
-
-
   //  Fetch Blogs
   const fetchBlogs = async () => {
     try {

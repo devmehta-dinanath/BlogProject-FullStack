@@ -99,7 +99,7 @@ import Profile from './pages/Profile';
 import YourBlogs from './pages/YourBlogs';
 import BlogDetail from './pages/BlogDetail';
 import EditBlog from './pages/EditBlog';
-
+import ChangePassword from './pages/ChangePassword';
 function App() {
   //  Initialize state with localStorage data
   const [user, setUser] = useState(() => {
@@ -155,6 +155,7 @@ function App() {
           <Route path="/create-blog" element={<CreateBlog />} />
           <Route path="/verify-email/:uid/:token" element={<VerifyEmail />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/change-password" element={<ChangePassword />} />
           <Route path="/reset-password/:uid/:token" element={<ResetPassword />} />
           <Route path="/profile" element={<Profile user={user} setUser={updateUser} />} />
           <Route path="/yourblog" element={<YourBlogs/>}/>

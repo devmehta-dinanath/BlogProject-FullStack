@@ -1,20 +1,20 @@
-
-import { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const BlogDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [blog, setBlog] = useState(null);
   const [comments, setComments] = useState([]);
-  const [newComment, setNewComment] = useState('');
-  const [error, setError] = useState('');
+  const [newComment, setNewComment] = useState("");
+  const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
 
-  //  Fetch Blog Function
+  // Fetch Blog Function
   const fetchBlog = async () => {
-    setLoading(true); // ✅ Start loading
-  
+    setLoading(true);
     try {
       const response = await fetch(`http://127.0.0.1:8000/api/blogs/${id}/`, {
         method: "GET",
@@ -22,36 +22,33 @@ const BlogDetail = () => {
           "Content-Type": "application/json",
         },
       });
-  
+
       if (!response.ok) {
         throw new Error("Failed to fetch blog");
       }
-  
+
       const data = await response.json();
       setBlog(data);
     } catch (error) {
       console.error("Error fetching blog:", error);
       setError("Failed to load blog");
     } finally {
-      setLoading(false); // ✅ Stop loading after fetch attempt
+      setLoading(false);
     }
   };
-  
 
-  // ✅ Fetch Comments Function
-  
+  // Fetch Comments Function
   const fetchComments = async () => {
     try {
-      // const token = localStorage.getItem("accessToken");
-      // if (!token) throw new Error("Unauthorized. Please log in.");
-
-      const response = await fetch(`http://127.0.0.1:8000/api/blogs/${id}/comments/`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          // Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await fetch(
+        `http://127.0.0.1:8000/api/blogs/${id}/comments/`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
       if (!response.ok) throw new Error("Failed to load comments");
 
@@ -63,63 +60,80 @@ const BlogDetail = () => {
     }
   };
 
-// Post New Comment Function
-const handlePostComment = async () => {
-  if (!newComment.trim()) return;
-
-  try {
+  // Post New Comment Function
+  const handlePostComment = async () => {
     const token = localStorage.getItem("accessToken");
-    if (!token) throw new Error("Unauthorized. Please log in.");
 
-    // ✅ FIXED: Changed endpoint to `/comments/create/`
-    const response = await fetch(`http://127.0.0.1:8000/api/blogs/${id}/comments/create/`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({ content: newComment }),
-    });
+    if (!token) {
+      toast.error("Please log in to comment.");
+      navigate("/login");
+      return;
+    }
 
-    if (!response.ok) throw new Error("Failed to post comment");
-
-    const newCommentData = await response.json();
-    setComments([...comments, newCommentData]);
-    setNewComment('');
-  } catch (err) {
-    console.error("Error posting comment:", err);
-    setError(err.message || "Failed to post comment");
-  }
-};
-
-
-
-  // Delete Comment Function
-  const handleDeleteComment = async (commentId) => {
-    if (!window.confirm("Are you sure you want to delete this comment?")) return;
+    if (!newComment.trim()) return;
 
     try {
-      const token = localStorage.getItem("accessToken");
-      if (!token) throw new Error("Unauthorized. Please log in.");
+      const response = await fetch(
+        `http://127.0.0.1:8000/api/blogs/${id}/comments/create/`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ content: newComment }),
+        }
+      );
 
-      const response = await fetch(`http://127.0.0.1:8000/api/blogs/${id}/comments/${commentId}/`, {
+      if (!response.ok) throw new Error("Failed to post comment");
+
+      const newCommentData = await response.json();
+      setComments([...comments, newCommentData]);
+      setNewComment("");
+      toast.success("Comment posted successfully!");
+    } catch (err) {
+      console.error("Error posting comment:", err);
+      setError(err.message || "Failed to post comment");
+    }
+  };
+
+  // Delete Comment Function
+ // Delete Comment Function
+const handleDeleteComment = async (commentId) => {
+  const token = localStorage.getItem("accessToken");
+
+  if (!token) {
+    toast.error("Please log in to delete the comment.");
+    navigate("/login");
+    return;
+  }
+
+  if (!window.confirm("Are you sure you want to delete this comment?")) return;
+
+  try {
+    const response = await fetch(
+      `http://127.0.0.1:8000/api/blogs/${id}/comments/${commentId}/`,
+      {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-      });
+      }
+    );
 
-      if (!response.ok) throw new Error("Failed to delete comment");
+    if (!response.ok) throw new Error("Failed to delete comment");
 
-      setComments((prevComments) =>
-        prevComments.filter((comment) => comment.id !== commentId)
-      ); // ✅ Remove from state immediately
-    } catch (err) {
-      console.error("Error deleting comment:", err);
-      setError(err.message || "Failed to delete comment");
-    }
-  };
+    setComments((prevComments) =>
+      prevComments.filter((comment) => comment.id !== commentId)
+    );
+    toast.success("Comment deleted successfully!");
+  } catch (err) {
+    console.error("Error deleting comment:", err);
+    setError(err.message || "Failed to delete comment");
+  }
+};
+
 
   // Logout Function
   const handleLogout = () => {
@@ -129,15 +143,17 @@ const handlePostComment = async () => {
 
   useEffect(() => {
     fetchBlog();
-    fetchComments(); // Fetch comments when the page loads
+    fetchComments();
   }, [id]);
 
   // Display Loading State
   if (loading) {
-    return <p className="text-center text-gray-500 mt-6">Loading blog details...</p>;
+    return (
+      <p className="text-center text-gray-500 mt-6">Loading blog details...</p>
+    );
   }
 
-  //  Display Error Message
+  // Display Error Message
   if (error) {
     return (
       <div className="text-red-500 text-center mt-6">
@@ -187,7 +203,7 @@ const handlePostComment = async () => {
       <div className="mt-8">
         <h3 className="text-xl font-semibold text-gray-800 mb-4">Comments</h3>
 
-        {/*  Render Existing Comments */}
+        {/* Render Existing Comments */}
         {comments.map((comment) => (
           <div key={comment.id} className="bg-gray-100 p-3 rounded-lg mb-2">
             <p className="text-gray-700">{comment.content}</p>
@@ -203,7 +219,7 @@ const handlePostComment = async () => {
           </div>
         ))}
 
-        {/*  Comment Input */}
+        {/* Comment Input */}
         <div className="flex mt-4">
           <input
             type="text"
@@ -233,4 +249,3 @@ const handlePostComment = async () => {
 };
 
 export default BlogDetail;
-
