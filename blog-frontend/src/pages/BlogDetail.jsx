@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+const BASE_URL = import.meta.env.VITE_BACKEND_URL;
 
 const BlogDetail = () => {
   const { id } = useParams();
@@ -16,7 +17,7 @@ const BlogDetail = () => {
   const fetchBlog = async () => {
     setLoading(true);
     try {
-      const response = await fetch(`http://127.0.0.1:8000/api/blogs/${id}/`, {
+      const response = await fetch(`${BASE_URL}/api/blogs/${id}/`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -41,7 +42,7 @@ const BlogDetail = () => {
   const fetchComments = async () => {
     try {
       const response = await fetch(
-        `http://127.0.0.1:8000/api/blogs/${id}/comments/`,
+        `${BASE_URL}/api/blogs/${id}/comments/`,
         {
           method: "GET",
           headers: {
@@ -74,7 +75,7 @@ const BlogDetail = () => {
 
     try {
       const response = await fetch(
-        `http://127.0.0.1:8000/api/blogs/${id}/comments/create/`,
+        `${BASE_URL}/api/blogs/${id}/comments/create/`,
         {
           method: "POST",
           headers: {
@@ -112,7 +113,7 @@ const handleDeleteComment = async (commentId) => {
 
   try {
     const response = await fetch(
-      `http://127.0.0.1:8000/api/blogs/${id}/comments/${commentId}/`,
+      `${BASE_URL}/api/blogs/${id}/comments/${commentId}/`,
       {
         method: "DELETE",
         headers: {

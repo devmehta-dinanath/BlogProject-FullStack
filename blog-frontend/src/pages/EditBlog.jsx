@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
+const BASE_URL = import.meta.env.VITE_BACKEND_URL;
+
 const EditBlog = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -13,7 +15,7 @@ const EditBlog = () => {
   useEffect(() => {
     const fetchBlog = async () => {
       try {
-        const response = await fetch(`http://127.0.0.1:8000/api/blogs/${id}/`);
+        const response = await fetch(`${BASE_URL}/api/blogs/${id}/`);
         if (!response.ok) throw new Error("Failed to fetch blog");
 
         const data = await response.json();
@@ -36,7 +38,7 @@ const EditBlog = () => {
       if (image) formData.append("image", image);
   
       const token = localStorage.getItem("accessToken");
-      const response = await fetch(`http://127.0.0.1:8000/api/blogs/${id}/update/`, {
+      const response = await fetch(`${BASE_URL}/api/blogs/${id}/update/`, {
         method: "PATCH",
         headers: {
           Authorization: `Bearer ${token}`,

@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
+const BASE_URL = import.meta.env.VITE_BACKEND_URL;
+
 const CreateBlog = () => {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
@@ -44,7 +46,7 @@ const CreateBlog = () => {
     }
 
     try {
-      const response = await fetch('http://127.0.0.1:8000/api/blogs/', {
+      const response = await fetch(`${BASE_URL}/api/blogs/`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,

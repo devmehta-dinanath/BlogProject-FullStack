@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import RegexValidator
+from ckeditor.fields import RichTextField
 
 # Define phone number validation (only 10 digits allowed)
 phone_regex = RegexValidator(
@@ -25,7 +26,7 @@ class BlogPost(models.Model):
     id=models.AutoField(primary_key=True)
     author = models.ForeignKey(User, on_delete=models.CASCADE)  # Link to User model
     title = models.CharField(max_length=200)
-    content = models.TextField()
+    content = RichTextField()
     image = models.ImageField(upload_to='blog_images/', null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)  
     updated_at = models.DateTimeField(auto_now=True) 

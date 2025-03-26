@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 
+const BASE_URL = import.meta.env.VITE_BACKEND_URL;
+
 const VerifyEmail = () => {
   const { uid, token } = useParams(); // Get uid & token from URL
   const navigate = useNavigate();
@@ -12,7 +14,7 @@ const VerifyEmail = () => {
 
       try {
         const response = await fetch(
-          `http://127.0.0.1:8000/api/auth/verify-email/${encodeURIComponent(uid)}/${encodeURIComponent(token)}/`,
+          `${BASE_URL}/api/auth/verify-email/${encodeURIComponent(uid)}/${encodeURIComponent(token)}/`,
           {
             method: "GET",
             headers: {

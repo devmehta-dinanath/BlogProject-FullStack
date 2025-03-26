@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { FiEye, FiTrash } from "react-icons/fi";
 import { useNavigate } from 'react-router-dom';
 
+const BASE_URL = import.meta.env.VITE_BACKEND_URL;
+
 const Dashboard = () => {
   const [blogs, setBlogs] = useState([]);
   const [error, setError] = useState('');
@@ -22,7 +24,7 @@ const Dashboard = () => {
   
       console.log("Fetching blogs with headers:", headers);
     
-      const response = await fetch("http://127.0.0.1:8000/api/getblogs/", {
+      const response = await fetch(`${BASE_URL}/api/getblogs/`, {
         method: "GET",
         headers,
       });
@@ -45,7 +47,7 @@ const Dashboard = () => {
       const refreshToken = localStorage.getItem("refreshToken");
       if (!refreshToken) return null;
   
-      const response = await fetch("http://127.0.0.1:8000/api/auth/token/refresh/", {
+      const response = await fetch(`${BASE_URL}/api/auth/token/refresh/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -83,7 +85,7 @@ const Dashboard = () => {
     if (window.confirm("Are you sure you want to delete this blog?")) {
       try {
         const token = localStorage.getItem("accessToken");
-        const response = await fetch(`http://127.0.0.1:8000/api/blogs/${id}/delete/`, {
+        const response = await fetch(`${BASE_URL}/api/blogs/${id}/delete/`, {
           method: "DELETE",
           headers: {
             "Content-Type": "application/json",

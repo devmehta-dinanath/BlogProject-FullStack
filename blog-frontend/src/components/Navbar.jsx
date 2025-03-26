@@ -3,6 +3,8 @@ import { Link } from "react-router-dom";
 import logo from "../assets/logo.png";
 import profile from "../assets/profile.jpeg";
 
+const BASE_URL = import.meta.env.VITE_BACKEND_URL;
+
 const Navbar = ({ user, setUser }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -13,7 +15,7 @@ const Navbar = ({ user, setUser }) => {
     if (storedUser && JSON.stringify(storedUser) !== JSON.stringify(user)) {
       setUser(storedUser);
       if (storedUser.profile_picture) {
-        setProfileImage(`http://127.0.0.1:8000${storedUser.profile_picture}`);
+        setProfileImage(`${BASE_URL}${storedUser.profile_picture}`);
       }
     }
 
@@ -33,7 +35,7 @@ const Navbar = ({ user, setUser }) => {
 
   useEffect(() => {
     if (user?.profile_picture) {
-      setProfileImage(`http://127.0.0.1:8000${user.profile_picture}`);
+      setProfileImage(`${BASE_URL}${user.profile_picture}`);
     } else {
       setProfileImage(profile);
     }

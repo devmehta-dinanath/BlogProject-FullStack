@@ -4,6 +4,8 @@ import { FiEye, FiEyeOff } from "react-icons/fi";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
+const BASE_URL = import.meta.env.VITE_BACKEND_URL;
+
 const Login = ({ setUser }) => {
   const [formData, setFormData] = useState({ login_field: "", password: "" });
   const [error, setError] = useState("");
@@ -24,7 +26,7 @@ const Login = ({ setUser }) => {
     setShowResendLink(false);
 
     try {
-      const response = await fetch("http://127.0.0.1:8000/api/auth/login/", {
+      const response = await fetch(`${BASE_URL}/api/auth/login/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -76,7 +78,7 @@ const Login = ({ setUser }) => {
       let email = formData.login_field;
 
       if (!email.includes("@")) {
-        const response = await fetch(`http://127.0.0.1:8000/api/auth/get-email/`, {
+        const response = await fetch(`${BASE_URL}/api/auth/get-email/`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -92,7 +94,7 @@ const Login = ({ setUser }) => {
         }
       }
 
-      const response = await fetch("http://127.0.0.1:8000/api/auth/resend-verification-email/", {
+      const response = await fetch(`${BASE_URL}/api/auth/resend-verification-email/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

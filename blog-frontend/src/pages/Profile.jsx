@@ -4,6 +4,8 @@ import { useNavigate } from "react-router-dom";
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
+const BASE_URL = import.meta.env.VITE_BACKEND_URL;
+
 const Profile = ({ user, setUser }) => {
   const [formData, setFormData] = useState({
     first_name: "",
@@ -21,7 +23,7 @@ const Profile = ({ user, setUser }) => {
     const fetchProfile = async () => {
       try {
         const token = localStorage.getItem("accessToken");
-        const response = await fetch("http://127.0.0.1:8000/api/profile/", {
+        const response = await fetch(`${BASE_URL}/api/profile/`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -66,7 +68,7 @@ const Profile = ({ user, setUser }) => {
 
     try {
       const token = localStorage.getItem("accessToken");
-      const response = await fetch('http://127.0.0.1:8000/api/profile/', {
+      const response = await fetch(`${BASE_URL}/api/profile/`, {
         method: 'PUT',
         headers: { Authorization: `Bearer ${token}` },
         body: data,

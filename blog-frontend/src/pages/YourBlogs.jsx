@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FiEye, FiEdit, FiTrash, FiMessageCircle } from "react-icons/fi";
 
+const BASE_URL = import.meta.env.VITE_BACKEND_URL;
+
 const YourBlogs = () => {
   const [blogs, setBlogs] = useState([]);
   const [error, setError] = useState('');
@@ -13,7 +15,7 @@ const YourBlogs = () => {
         const token = localStorage.getItem("accessToken");
         if (!token) throw new Error("Please log in to view your blogs");
 
-        const response = await fetch("http://127.0.0.1:8000/api/your-blogs/", {
+        const response = await fetch(`${BASE_URL}/api/your-blogs/`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -38,7 +40,7 @@ const YourBlogs = () => {
     if (window.confirm("Are you sure you want to delete this blog?")) {
       try {
         const token = localStorage.getItem("accessToken");
-        const response = await fetch(`http://127.0.0.1:8000/api/blogs/${id}/delete/`, {
+        const response = await fetch(`${BASE_URL}/api/blogs/${id}/delete/`, {
           method: "DELETE",
           headers: {
             "Content-Type": "application/json",

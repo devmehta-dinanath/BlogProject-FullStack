@@ -39,7 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'Blog_app',  
-    'corsheaders',  
+    'corsheaders', 
+    "ckeditor" 
 ]
 
 MIDDLEWARE = [
@@ -224,3 +225,12 @@ REST_FRAMEWORK = {
 
 
 CSRF_TRUSTED_ORIGINS = ['http://localhost:5173', 'http://127.0.0.1:5173']
+
+
+CKEDITOR_CONFIGS = {
+    'default': {
+        'toolbar': 'full',
+        'height': 300,
+        'width': 'auto',
+    },
+}

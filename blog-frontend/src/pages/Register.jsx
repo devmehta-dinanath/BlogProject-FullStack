@@ -6,6 +6,8 @@ import { useNavigate } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 
+const BASE_URL = import.meta.env.VITE_BACKEND_URL;
+
 const Register = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
@@ -50,7 +52,7 @@ const Register = () => {
     const loadingToast = toast.loading("Sending verification link...");
 
     try {
-      const response = await fetch("http://127.0.0.1:8000/api/auth/register/", {
+      const response = await fetch(`${BASE_URL}/api/auth/register/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

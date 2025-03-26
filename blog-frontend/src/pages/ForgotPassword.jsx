@@ -2,6 +2,8 @@ import { useState } from "react";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
+const BASE_URL = import.meta.env.VITE_BACKEND_URL;
+
 const ForgotPassword = () => {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
@@ -21,7 +23,7 @@ const ForgotPassword = () => {
     const toastId = toast.loading("⏳ Sending password reset link...");
 
     try {
-      const response = await fetch("http://127.0.0.1:8000/api/auth/password-reset/", {
+      const response = await fetch(`${BASE_URL}/api/auth/password-reset/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"

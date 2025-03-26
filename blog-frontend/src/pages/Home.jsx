@@ -2,15 +2,12 @@ import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import logo from "../assets/logo.png";
 
+
+
 const Home = ({ user }) => {
   const navigate = useNavigate();
 
-  // useEffect(() => {
-  //   document.body.style.overflow = "hidden";
-  //   return () => {
-  //     document.body.style.overflow = "";
-  //   };
-  // }, []);
+ 
 
   const handleGetStarted = () => {
     // console.log("USER STATE IN HOME:", user); // Debugging user state

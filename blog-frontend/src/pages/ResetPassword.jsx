@@ -4,6 +4,8 @@ import { FiEye, FiEyeOff } from "react-icons/fi";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
+const BASE_URL = import.meta.env.VITE_BACKEND_URL;
+
 const ResetPassword = () => {
   const { uid, token } = useParams();
   const navigate = useNavigate();
@@ -33,7 +35,7 @@ const ResetPassword = () => {
 
     try {
       const response = await fetch(
-        `http://127.0.0.1:8000/api/auth/password-reset/${uid}/${token}/`,
+        `${BASE_URL}/api/auth/password-reset/${uid}/${token}/`,
         {
           method: "POST",
           headers: {
