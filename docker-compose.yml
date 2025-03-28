@@ -1,0 +1,41 @@
+version: "3.8"
+
+services:
+  frontend:
+    build: ./blog-frontend
+    ports:
+      - "5002:5002"
+    depends_on:
+      - backend
+    restart: always
+
+  backend:
+    build: ./BlogProject
+    ports:
+      - "8002:8002"
+    depends_on:
+      - db
+    environment:
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_NAME=blogDB
+      - DB_USER=DevMehta
+      - DB_PASSWORD=Neelam@123
+    restart: always
+
+  db:
+    image: mysql:latest
+    container_name: mysql_container
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: Meht@dev
+      MYSQL_DATABASE: blogDB
+      MYSQL_USER: DevMehta
+      MYSQL_PASSWORD: Neelam@123
+    ports:
+      - "3002:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+volumes:
+  mysql_data:

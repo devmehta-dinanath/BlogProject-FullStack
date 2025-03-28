@@ -37,7 +37,7 @@ POST--> http://127.0.0.1:8000/api/auth/logout/
 
 
 git init
-git remote add origin https://github.com/devmehta-dinanath/test.git
+git remote add origin  https://github.com/devmehta-dinanath/BlogProject-FullStack.git
 git add .
 git commit -m "final"
 git push -u origin main

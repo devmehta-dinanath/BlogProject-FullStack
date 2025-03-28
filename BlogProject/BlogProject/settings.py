@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-+)eiqhp)2!)j@c6%xs8vy_#_0zs#-%c3h@j$i*gaw3gfm8_#b+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["127.0.0.1", "localhost"] 
 
 
 # Application definition
@@ -154,7 +154,7 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = "userauthentication.noreply@gmail.com"  
 EMAIL_HOST_PASSWORD = "pjknjjrujqvvcptb"  
 
-ALLOWED_HOSTS = ["127.0.0.1", "localhost"] #for email verificain link 
+
 
 # ✅ Allow CORS requests
 CORS_ALLOW_ALL_ORIGINS = True
