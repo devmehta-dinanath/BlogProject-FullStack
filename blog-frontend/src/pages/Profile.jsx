@@ -108,7 +108,7 @@ const Profile = ({ user, setUser }) => {
         <input type="email" name="email" value={formData.email} placeholder="Email" readOnly className="input-field bg-gray-100 cursor-not-allowed text-gray-500" />
         <input type="text" name="phone" value={formData.phone} onChange={handleChange} placeholder="Phone" className="input-field" />
         <input type="file" name="profile_picture" onChange={handleChange} className="file-input" accept="image/*" />
-        <button type="button" onClick={handleResetPassword} className="w-full bg-red-600 hover:bg-red-700 text-white py-3 rounded-xl font-medium transition duration-300">Change Password</button>
+        <button type="button" onClick={handleResetPassword} className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-medium transition duration-300">Change Password</button>
         <button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-medium transition duration-300">Save Changes</button>
        
       </form>

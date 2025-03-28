@@ -98,7 +98,6 @@ const BlogDetail = () => {
     }
   };
 
-  // Delete Comment Function
  // Delete Comment Function
 const handleDeleteComment = async (commentId) => {
   const token = localStorage.getItem("accessToken");

@@ -1,5 +1,4 @@
-from django.contrib.auth import authenticate, login, logout
-from django.http import JsonResponse
+from django.contrib.auth import logout
 from django.shortcuts import get_object_or_404
 from rest_framework import status, generics, permissions
 from rest_framework.views import APIView
@@ -15,7 +14,7 @@ from django.core.mail import send_mail
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_str
 from django.contrib.auth.tokens import default_token_generator
-from django.urls import reverse
+
 from django.conf import settings
 from rest_framework_simplejwt.tokens import RefreshToken
 
@@ -217,7 +216,7 @@ class LogoutView(APIView):
 #  Custom Pagination Class
 from rest_framework import pagination
 class BlogPagination(pagination.PageNumberPagination):
-    page_size = 3  # ✅ Number of blogs per page
+    page_size = 3 
     page_size_query_param = 'page_size'
     max_page_size = 100
 
@@ -236,7 +235,6 @@ class CreateBlogView(generics.ListCreateAPIView):
 
 #fetch blog on dashboard without login
 class BlogView(generics.ListCreateAPIView):
-    # permission_classes = [permissions.IsAuthenticated]
     serializer_class = BlogPostSerializer
 
     def get_queryset(self):
@@ -258,7 +256,7 @@ class BlogListView(generics.ListCreateAPIView):
 
 # Blog Detail only Authenticate user can access that
 class BlogDetailView(APIView):
-    permission_classes = [AllowAny]  
+     # permission_classes = [AllowAny]  
 
     def get(self, request, pk):
         try:
@@ -268,18 +266,7 @@ class BlogDetailView(APIView):
         except BlogPost.DoesNotExist:
             return Response({"detail": "Blog not found"}, status=status.HTTP_404_NOT_FOUND)
         
-class DetailView(APIView):
-    # permission_classes = [AllowAny]  
-
-    def get(self, request, pk):
-        try:
-            blog = BlogPost.objects.get(pk=pk)
-            serializer = BlogDetailSerializer(blog, context={'request': request})
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        except BlogPost.DoesNotExist:
-            return Response({"detail": "Blog not found"}, status=status.HTTP_404_NOT_FOUND)
-        
-
+ 
 # Blog Delete Authenticate user can do that
 class BlogDeleteView(generics.DestroyAPIView):
     queryset = BlogPost.objects.all()
@@ -320,16 +307,6 @@ class ListCommentsView(generics.ListAPIView):
     def get_queryset(self):
         blog_id = self.kwargs['blog_id']
         return Comment.objects.filter(blog_id=blog_id).order_by('-created_at')
-    
-class CommentsView(generics.ListAPIView):
-    serializer_class = CommentSerializer
-    # permission_classes = [permissions.AllowAny]
-
-    def get_queryset(self):
-        blog_id = self.kwargs['blog_id']
-        return Comment.objects.filter(blog_id=blog_id).order_by('-created_at')
-
-# Create Comment(POST)
 #  Handle POST for creating a comment
 class CreateCommentView(generics.CreateAPIView):
     serializer_class = CommentSerializer

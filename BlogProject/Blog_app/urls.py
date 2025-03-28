@@ -4,7 +4,7 @@ from .views import (
     CreateBlogView, BlogDetailView, BlogDeleteView, UserProfileView,
     YourBlogsView, PasswordResetRequestView, PasswordResetConfirmView,
     CreateCommentView, ListCommentsView, DeleteCommentView,ResendVerificationEmailView,
-    GetEmailView,BlogView,BlogUpdateView,DetailView,CommentsView
+    GetEmailView,BlogView,BlogUpdateView,
 )
 
 urlpatterns = [
@@ -19,12 +19,11 @@ urlpatterns = [
 
     path('blogs/', CreateBlogView.as_view(), name='create-blog'),
     path('getblogs/', BlogView.as_view(), name='create-blog'), 
-    path('viewblogs/', DetailView.as_view(), name='blog-detail'),
-    path('viewcomments/', CommentsView.as_view(), name='list-comments'),
-    path('blogs/<int:pk>/', BlogDetailView.as_view(), name='blog-detail'),
+    # path('viewblogs/', DetailView.as_view(), name='blog-detail'),
+     path('blogs/<int:pk>/', BlogDetailView.as_view(), name='blog-detail'),
     path('blogs/<int:pk>/delete/', BlogDeleteView.as_view(), name='blog-delete'),
     path('blogs/<int:pk>/update/', BlogUpdateView.as_view(), name='update-blog'),
-    path('blogs/<int:pk>/update/', BlogUpdateView.as_view(), name='blog-update'),
+    # path('blogs/<int:pk>/update/', BlogUpdateView.as_view(), name='blog-update'),
 
 
 
